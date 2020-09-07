@@ -37,20 +37,3 @@ public class BTSServlet extends HttpServlet{
 		req.getRequestDispatcher("/WEB-INF/bts/btsList.jsp").forward(req, resp);
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,40 +1,39 @@
 <%@page import="java.util.Objects"%>
 <%@page import="org.apache.commons.lang3.StringUtils"%>
 <%@ page language="java" pageEncoding="UTF-8"%>
-<%!
-// * 9
+<%!// * 9
 // * 8
 // * 7
 private long factorial(int num, StringBuffer expr){
-	if(num<=0){
-		throw new IllegalArgumentException("음수는 연산 불가");
-	}else if(num==1){
-		expr.append(num);
-		return num;
-	}else{
-		expr.append(num + "* ");
-		return num*factorial(num-1, expr);
+		if (num <= 0) {
+			throw new IllegalArgumentException("음수는 연산 불가");
+		} else if (num == 1) {
+			expr.append(num);
+			return num;
+		} else {
+			expr.append(num + "* ");
+			return num * factorial(num - 1, expr);
+		}
 	}
-}
 %>    
 <%
-	String accept = request.getHeader("Accept");
-	String mime = "text/html;charset=UTF-8";
-	if(accept.contains("json")){
-		mime = "application/json;charset=UTF-8";
-	}
-	response.setContentType(mime);
-	String opParam = request.getParameter("op");
-	if(StringUtils.isNotBlank(opParam) && StringUtils.isNumeric(opParam)){
-		int num = Integer.parseInt(opParam);
-		StringBuffer expr = new StringBuffer();
-		long result = factorial(num, expr);
+    	String accept = request.getHeader("Accept");
+    	String mime = "text/html;charset=UTF-8";
+    	if (accept.contains("json")) {
+    		mime = "application/json;charset=UTF-8";
+    	}
+    	response.setContentType(mime);
+    	String opParam = request.getParameter("op");
+    	if (StringUtils.isNotBlank(opParam) && StringUtils.isNumeric(opParam)) {
+    		int num = Integer.parseInt(opParam);
+    		StringBuffer expr = new StringBuffer();
+    		long result = factorial(num, expr);
 %>
-{
-	"expression":"<%=String.format("!%d = %s = %d", num, expr, result) %>"
-}
+	{
+			"expression":"<%=String.format("!%d = %s = %d", num, expr, result) %>"
+	}
 <%
-	}else{
+	} else {
 %>
 <!DOCTYPE html>
 <html>

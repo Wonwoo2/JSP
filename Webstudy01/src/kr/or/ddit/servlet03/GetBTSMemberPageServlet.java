@@ -33,7 +33,7 @@ public class GetBTSMemberPageServlet extends HttpServlet{
 				msg = member+" 은 존재하지 않습니다. ";
 			}
 		}
-		if(statusCode!=200) {
+		if(statusCode != 200) {
 			resp.sendError(statusCode, msg);
 		}else {
 			String[] memberInfo = btsMap.get(member);
@@ -43,19 +43,3 @@ public class GetBTSMemberPageServlet extends HttpServlet{
 		}
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

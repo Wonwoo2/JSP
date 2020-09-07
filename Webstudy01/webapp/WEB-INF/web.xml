@@ -4,6 +4,11 @@
 	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
 	version="3.1">
 	<display-name>webStudy01</display-name>
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+		<welcome-file>index.htm</welcome-file>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
 	<context-param>
 		<param-name>testParam</param-name>
 		<param-value>paramValue</param-value>
@@ -39,7 +44,7 @@
 		<url-pattern>/image/imageList.do</url-pattern>	
 	</servlet-mapping>
 	<session-config>
-		<session-timeout>2</session-timeout>
+		<session-timeout>10</session-timeout>
 	</session-config>
 <!-- 	<error-page> -->
 <!-- 		<exception-type>kr.or.ddit.exception.CustomException</exception-type> -->

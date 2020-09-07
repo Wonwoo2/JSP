@@ -71,27 +71,5 @@ public class DescrptionServlet extends HttpServlet{
 	@Override
 	public void destroy() {
 		super.destroy();
-		System.out.printf("%s 소멸\n", getClass().getSimpleName());
 	}
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

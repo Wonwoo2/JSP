@@ -83,16 +83,3 @@ private static enum BrowserType{
 </table>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-

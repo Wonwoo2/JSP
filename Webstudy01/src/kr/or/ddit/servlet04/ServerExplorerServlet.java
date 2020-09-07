@@ -36,13 +36,3 @@ public class ServerExplorerServlet extends HttpServlet{
 		req.getRequestDispatcher("/WEB-INF/views/serverExplorer.jsp").forward(req, resp);
 	}
 }
-
-
-
-
-
-
-
-
-
-

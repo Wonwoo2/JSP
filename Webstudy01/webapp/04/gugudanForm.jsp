@@ -74,16 +74,4 @@
 </form>
 <div id="result"></div>
 </body>
-
-
-
-
-
-
-
-
-
-
-
-
 </html>
