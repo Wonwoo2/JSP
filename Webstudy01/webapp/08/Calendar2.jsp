@@ -16,7 +16,7 @@
 #calView {
 	text-align: center;
 	display: inline-block;
-	width: 60%;
+	width: 70%;
 	margin-left: 5%;
 	padding: 10px;
 }

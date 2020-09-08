@@ -27,9 +27,7 @@ public class ImageStreamingServlet extends HttpServlet{
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
-		System.out.println(getServletContext().hashCode());
 		application = getServletContext();
-//		String contentsPath = config.getInitParameter("contentsPath");
 		String contentsPath = application.getInitParameter("contentsPath");
 		folder = new File(contentsPath);
 	}
