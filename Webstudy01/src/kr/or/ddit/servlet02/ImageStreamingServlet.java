@@ -82,16 +82,3 @@ public class ImageStreamingServlet extends HttpServlet{
 //		}
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

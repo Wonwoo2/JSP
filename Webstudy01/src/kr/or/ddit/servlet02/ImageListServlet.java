@@ -21,7 +21,6 @@ public class ImageListServlet extends HttpServlet{
 	 */
 	private static final long serialVersionUID = 1L;
 	private File folder;
-	private String pattern = "<option class='%s'>%s</option>\n";
 	private ServletContext application;
 
 	@Override
@@ -37,25 +36,13 @@ public class ImageListServlet extends HttpServlet{
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String[] listFiles = folder.list((dir, name)->{
 			boolean accept = false;
-//			image/jpeg, image/gif, image/png
 			String mime = application.getMimeType(name);
 			accept = mime!=null && (mime.startsWith("image/") || mime.startsWith("video/"));
 			return accept;
 		});
 		
-		StringBuffer options = new StringBuffer();
-		for(String file : listFiles) {
-			String fileMime = application.getMimeType(file);
-			options.append( String.format(pattern, fileMime, file) );
-		}
-		Map<String, Object> attributeMap = new LinkedHashMap<>();
-		attributeMap.put("options", options);
-		String tmplPath = "/kr/or/ddit/servlet02/fileList.tmpl";
-		String html = TemplateUtils.readAndReplace(tmplPath, attributeMap);
-		
-		resp.setContentType("text/html;charset=UTF-8");
-		PrintWriter out = resp.getWriter();
-		out.println(html);
-		out.close();
+		req.setAttribute("listFiles", listFiles);
+		req.setAttribute("includePage", "/WEB-INF/views/imageView.jsp");
+		req.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(req, resp);
 	}
 }

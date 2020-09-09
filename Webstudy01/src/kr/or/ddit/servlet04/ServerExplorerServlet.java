@@ -93,7 +93,9 @@ public class ServerExplorerServlet extends HttpServlet{
 			}
 		} else {
 			req.setAttribute("listFiles", wrappers);
-			req.getRequestDispatcher("/WEB-INF/views/serverExplorer.jsp").forward(req, resp);
+			req.setAttribute("includePage", "/WEB-INF/views/serverExplorer.jsp");
+			
+			req.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(req, resp);
 		}
 	}
 	

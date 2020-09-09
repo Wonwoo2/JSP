@@ -6,11 +6,6 @@
 <%
 	ServletContext context = getServletContext().getContext("/dummy");
 %>
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title></title>
 <style type=text/css>
 #tree1, #tree2 {
 	width : 40%;
@@ -19,10 +14,9 @@
 }
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.fancytree/2.36.1/skin-win8/ui.fancytree.min.css">
-<script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-3.5.1.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.fancytree/2.36.1/jquery.fancytree-all-deps.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.fancytree/2.36.1/jquery.fancytree-all.min.js"></script>
-<script type="text/javascript" src="//code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
 <script type="text/javascript">
 	$(function() {
 		var tree1 = null;
@@ -155,8 +149,6 @@
 		});
 	});
 </script>
-</head>
-<body>
 <h4>Model2 구조로 webStudy01 컨텍스트의 익스플로러 구현</h4>
 	<div id="tree1">
 		<ul>
@@ -168,5 +160,3 @@
 			<li id="/" class="folder lazy"><%= context.getContextPath() %></li>
 		</ul>
 	</div>
-</body>
-</html>

@@ -60,7 +60,7 @@
 					<td width='300' align='center' valign='middle'>title</td>
 					<td width="150" align="left" valign="middle">
 						<a href=""> 
-							<img id="rightImg" src="<%=request.getContextPath()%>/images/images.png" width="50" height="50">
+							<img id="rightImg" src="<%= request.getContextPath() %>/images/images.png" width="50" height="50">
 						</a>
 					</td>
 				</tr>

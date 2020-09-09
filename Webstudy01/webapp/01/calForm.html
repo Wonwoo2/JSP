@@ -1,14 +1,5 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
-
-
-</head>
-<body>
 <!-- 사칙연산에 필요한 데이터를 입력받기 위한 UI -->
-<form id="calForm" name="calForm" action="calculate.do"  onreset="alert('2');" method="get">
+<form id="calForm" name="calForm" action="../01/calculate.do"  onreset="alert('2');" method="get">
 	<input type="number" name="leftOp" required/>
 	<select name="operator">
 		<option value="PLUS">+</option>
@@ -23,20 +14,18 @@
 </form>
 <div id="resultArea">	
 </div>
-<script type="text/javascript" src="../js/jquery-3.5.1.min.js"></script>
 <script type="text/javascript">
 	var resultArea = $("#resultArea");
 	$("#calForm").on("submit", function(event){
 		event.preventDefault();
 		// 동기요청을 비동기로 전환.
-		let url = this.action? this.action : "";
+		let url = this.action ? this.action : "";
 		let data = {};
 		let inputs = $(this).find(":input");
 		$.each(inputs, function(index, input){
 			let nameAttr = input.name;
 			if(nameAttr){
 				let valueAttr = input.value;
-// 				data.op=8;
 				data[nameAttr] = valueAttr;
 			}
 		});
@@ -45,17 +34,15 @@
 			url : url,
 			data : data,
 			method : method,
-			dataType : "xml", // 1. html, text, json, xml
+			dataType : "json", // 1. html, text, json, xml
 			success : function(resp) {
-// 				resultArea.html(resp.expression);
-				let tmp = $(resp).find("expression");
-				resultArea.html(tmp.html());
-				console.log(tmp.html());
+ 				resultArea.html(resp.expression);
+				/* let tmp = $(resp).find("expression");
+				resultArea.html(tmp.html()); */
+				// console.log(tmp.html());
 			},
 			error : function(errResp) {
 			}
 		});
 	});
 </script>
-</body>
-</html>

@@ -15,7 +15,7 @@
 	</context-param>
 	<context-param>
 		<param-name>contentsPath</param-name>
-		<param-value>d:/contents</param-value>
+		<param-value>e:/contents</param-value>
 	</context-param>
 	<servlet>
 		<servlet-name>DescrptionServlet</servlet-name>
@@ -35,7 +35,7 @@
 		<servlet-class>kr.or.ddit.servlet02.ImageListServlet</servlet-class>
 		<init-param>
 			<param-name>contentsPath</param-name>
-			<param-value>d:/contents</param-value>
+			<param-value>e:/contents</param-value>
 		</init-param>
 		<load-on-startup>2</load-on-startup>
 	</servlet>
@@ -58,29 +58,10 @@
 <!-- 		<error-code>404</error-code> -->
 <!-- 		<location>/error/error404.jsp</location> -->
 <!-- 	</error-page> -->
+<!-- 	<jsp-config> -->
+<!-- 		<jsp-property-group> -->
+<!-- 			<url-pattern>/09/*</url-pattern> -->
+<!-- 			<include-prelude>/03/standard.jsp</include-prelude> -->
+<!-- 		</jsp-property-group> -->
+<!-- 	</jsp-config> -->
 </web-app>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
