@@ -2,9 +2,6 @@ package kr.or.ddit.servlet02;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -13,7 +10,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import kr.or.ddit.utils.TemplateUtils;
+import kr.or.ddit.Contants;
+import kr.or.ddit.utils.CookieUtils;
 
 public class ImageListServlet extends HttpServlet{
 	/**
@@ -40,6 +38,12 @@ public class ImageListServlet extends HttpServlet{
 			accept = mime!=null && (mime.startsWith("image/") || mime.startsWith("video/"));
 			return accept;
 		});
+		
+		
+		CookieUtils cookieUtils = new CookieUtils(req);
+		if(cookieUtils.exists(Contants.IMAGESTREAMINGCOOKIENAME)) {
+			req.setAttribute(Contants.IMAGESTREAMINGCOOKIENAME, cookieUtils.getCookieValue(Contants.IMAGESTREAMINGCOOKIENAME));
+		}
 		
 		req.setAttribute("listFiles", listFiles);
 		req.setAttribute("includePage", "/WEB-INF/views/imageView.jsp");

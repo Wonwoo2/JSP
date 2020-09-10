@@ -4,12 +4,16 @@ import java.io.IOException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
+
+import kr.or.ddit.utils.CookieUtils;
+import kr.or.ddit.utils.CookieUtils.TextType;
 
 @WebServlet("/login/loginProcess.do")
 public class LoginProcessServlet extends HttpServlet {
@@ -30,37 +34,39 @@ public class LoginProcessServlet extends HttpServlet {
 //			- 인증 성공 : welcome page로 이동(redirect)
 //				index.jsp 생성 (authID 라는 속성으로 현재 로그인한 유저의 아이디를 출력)
 //			- 인증 실패(비밀번호 오류 간주) : loginForm.jsp 로 이동 (동일한 아이디를 다시 입력하지 않도록)
-		
+
 		String mem_id = req.getParameter("mem_id");
 		String mem_pass = req.getParameter("mem_pass");
-		
-		if(StringUtils.isBlank(mem_id) || StringUtils.isBlank(mem_pass)){
+		String checked = req.getParameter("saveId");
+
+		if (StringUtils.isBlank(mem_id) || StringUtils.isBlank(mem_pass)) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "필수 파라미터 누락");
 			return;
 		}
-		
-		String goPage = null;
-		boolean redirect = false;
-		// HttpSession session = req.getSession(false);
-		HttpSession session = req.getSession();
-		
-		if(session == null || session.isNew()) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "현재 요청이 최초 요청일 수 없음");
-			return;
+
+		if (StringUtils.isNotBlank(checked)) {
+			Cookie chkCookie = CookieUtils.createCookie("check", checked, req.getContextPath(), 60 * 60 * 24 * 7,
+					TextType.PATH);
+			resp.addCookie(chkCookie);
 		}
 		
+		Cookie idCookie = CookieUtils.createCookie("mem_id", mem_id, req.getContextPath(), 60 * 60 * 24 * 7, TextType.PATH);
+		resp.addCookie(idCookie);
+
+		String goPage = null;
+		boolean redirect = false;
+
 		String msg = null;
-		if(mem_id.equals(mem_pass)) {
+		if (mem_id.equals(mem_pass)) {
 			goPage = "/";
 			redirect = true;
-			session.setAttribute("authId", mem_id);
 		} else {
 			goPage = "/login/loginForm.jsp";
 			msg = "비번 오류";
 			req.setAttribute("msg", msg);
 		}
-		
-		if(redirect) {
+
+		if (redirect) {
 			resp.sendRedirect(req.getContextPath() + goPage);
 		} else {
 			req.getRequestDispatcher(goPage).forward(req, resp);

@@ -1,15 +1,14 @@
+<%@page import="kr.or.ddit.Contants"%>
 <%@page import="org.apache.commons.lang3.StringUtils"%>
 <%@page import="java.io.File"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%
+	String streamingName = (String) request.getAttribute(Contants.IMAGESTREAMINGCOOKIENAME);
+%>
 <script type="text/javascript">
 	$(function() {
-		var imgPtrn = "<img src='image.do?image=%S'/>";
-		var videoPtrn = "<video src='image.do?image=%S' />";
-		var resultArea = $("#resultArea");
-		$("select").on("change", function() {
-			let value = $(this).val();
-			let option = $(this).find("option:selected");
+		var imageRendering = function(option, value) {
 			let clzName = $(option).attr("class");
 			let innerTag = null;
 			if (clzName.startsWith("image")) {
@@ -18,13 +17,37 @@
 				innerTag = videoPtrn.replace("%S", value);
 			}
 			if (innerTag) {
-				resultArea.html(innerTag);
+				resultArea.append(innerTag);
 			}
+		}
+		var imgPtrn = "<img src='image.do?image=%S'/>";
+		var videoPtrn = "<video src='image.do?image=%S' />";
+		var resultArea = $("#resultArea");
+		var select = $("select").on("change", function() {
+			let options = $(this).find("option:selected");
+			
+			resultArea.empty();
+			$(options).each(function(index, option) {
+					let value = $(this).text();
+				setTimeout(function(){
+					imageRendering(option, value);
+				}, 300);
+			});
 		});
+		
+		<%
+			if(StringUtils.isNotBlank(streamingName)) {
+		%>
+				let json = '<%= streamingName %>';
+				let objs = JSON.parse(json);
+				select.val(objs);
+				select.trigger("change");
+		<%
+			}
+		%>
 	});
 </script>
-<select>
-	<option>파일선택</option>
+<select multiple size="10">
 	<%
 		String[] listFiles = (String[]) request.getAttribute("listFiles");
 		for (String file : listFiles) {
@@ -32,9 +55,10 @@
 			String clz = StringUtils.startsWith(mime, "image/") ? "image"
 					: StringUtils.startsWith(mime, "video/") ? "video" : "none";
 	%>
-	<option class="<%=clz%>"><%=file%></option>
-	<%
+			<option class="<%=clz%>" ><%= file %></option>
+	<%	
 		}
 	%>
 </select>
-<div id="resultArea"></div>
+<div id="resultArea">
+</div>
