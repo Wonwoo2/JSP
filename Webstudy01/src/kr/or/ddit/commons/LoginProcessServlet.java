@@ -37,22 +37,35 @@ public class LoginProcessServlet extends HttpServlet {
 
 		String mem_id = req.getParameter("mem_id");
 		String mem_pass = req.getParameter("mem_pass");
-		String checked = req.getParameter("saveId");
+		String ynParam = req.getParameter("yn");
 
 		if (StringUtils.isBlank(mem_id) || StringUtils.isBlank(mem_pass)) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "필수 파라미터 누락");
 			return;
 		}
 
-		if (StringUtils.isNotBlank(checked)) {
-			Cookie chkCookie = CookieUtils.createCookie("check", checked, req.getContextPath(), 60 * 60 * 24 * 7,
+		Cookie chkCookie = null;
+		if (StringUtils.isNotBlank(ynParam)) {
+			chkCookie = CookieUtils.createCookie("check", ynParam, req.getContextPath(), 60 * 60 * 24 * 7,
 					TextType.PATH);
-			resp.addCookie(chkCookie);
 		}
 		
-		Cookie idCookie = CookieUtils.createCookie("mem_id", mem_id, req.getContextPath(), 60 * 60 * 24 * 7, TextType.PATH);
-		resp.addCookie(idCookie);
-
+		if(chkCookie != null) {
+			if("y".equals(ynParam)) {
+				resp.addCookie(chkCookie);
+			} else if("n".equals(ynParam)) {
+				chkCookie.setMaxAge(0);
+				resp.addCookie(chkCookie);
+			}
+		}
+		
+		HttpSession session = req.getSession();
+		
+		if(session == null && session.isNew()) {
+			resp.sendError(404, "잘못된 요청입니다.");
+			return;
+		}
+		
 		String goPage = null;
 		boolean redirect = false;
 
@@ -60,6 +73,7 @@ public class LoginProcessServlet extends HttpServlet {
 		if (mem_id.equals(mem_pass)) {
 			goPage = "/";
 			redirect = true;
+			session.setAttribute("mem_id", mem_id);
 		} else {
 			goPage = "/login/loginForm.jsp";
 			msg = "비번 오류";

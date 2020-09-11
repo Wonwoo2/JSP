@@ -22,7 +22,16 @@
 	String msg = (String) request.getAttribute("msg");
 	
 	CookieUtils cookieUtils = new CookieUtils(request);
-	String check = cookieUtils.getCookieValue("check");
+	String ynValue = cookieUtils.getCookieValue("check");
+	
+	String check = null;
+	if(StringUtils.isNotBlank(ynValue)) {
+		if("y".equals(ynValue)) {
+			check = "true";
+		} else if("n".equals(ynValue)) {
+			check = "false";
+		}
+	}
 	
 	if(StringUtils.isNotBlank(msg)) {
 %>
@@ -33,13 +42,21 @@
 
 <script type="text/javascript">
 	$(function() {
-		var check = $('#chk');
-		var checkValue = "<%= check %>";
-		check.on('click', function() {
-			if(this.name == "checked") {
-				$(this).attr("name", "unchecked");
-			} else {
-				$(this).attr("name", "checked");
+		var check = $("[name='saveId']");
+		var yn = $("[name='yn']");
+		
+		check.on('change', function() {
+			ynValue = yn.val();
+			if(ynValue == "y") {
+				$(this).attr("checked", false);
+				yn.val("n");
+				
+				console.log(yn.val());
+			} else if(ynValue == "n") {
+				$(this).attr("checked", true);
+				yn.val("y");
+				
+				console.log(yn.val());
 			}
 		});
 	});
@@ -49,7 +66,8 @@
 	<ul>
 		<li>
 			아이디 : <input type="text" name="mem_id" value="<%= Objects.toString(fail_id, "") %>"/>
-			<label><input id="chk" type="checkbox" name="saveId" /> 아이디 기억하기 </label>
+			<label><input type="checkbox" name="saveId" /> 아이디 기억하기 </label>
+			<input type="hidden" name="yn" value="n" />
 		</li>
 		<li>
 			비밀번호 : <input type="password" name="mem_pass" checked="<%= check %>"/>

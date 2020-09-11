@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
-    <wb-module deploy-name="Webstudy01">
+    <wb-module deploy-name="webstudy01">
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/res"/>
         <wb-resource deploy-path="/" source-path="/webapp"/>
-        <property name="context-root" value="Webstudy01"/>
-        <property name="java-output-path" value="/Webstudy01/build/classes"/>
+        <property name="java-output-path" value="/webstudy01/build/classes"/>
+        <property name="context-root" value="webstudy01"/>
     </wb-module>
 </project-modules>
