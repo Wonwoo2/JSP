@@ -51,7 +51,9 @@ public class MemberDaoImpl implements IMemberDao {
 													+ memVo.getAlias() + "', '"
 													+ memVo.getAddr1() + "', '"
 													+ memVo.getAddr2() + "', '"
-													+ memVo.getZipcode() + "'"
+													+ memVo.getZipcode() + ", '"
+													+ memVo.getFilename() + ", '"
+													+ memVo.getRealfilename() + "'"
 													+ " WHERE userid = '" + memVo.getUserid() + "'";
 		try (
 				Connection conn = getConnection();
@@ -78,28 +80,12 @@ public class MemberDaoImpl implements IMemberDao {
 	
 	@Override
 	public MemberVO getMember(String userid) {
-		String sql = "SELECT useid, usernm, pass, TO_CHAR(reg_dt, 'yyyy/mm/dd') AS reg_dt, "
-				+ "NVL(alias, \"\") AS alias, "
-				+ "NVL(addr1, \"\") AS addr1, "
-				+ "NVL(addr2, \"\") AS addr2, "
-				+ "NVL(zipcode, \"\") AS zipcode, "
-				+ "NVL(filename, \"\") AS filename, "
-				+ "NVL(realfilename, \"\") AS realfilename FROM users";
+		String sql = "SELECT * FROM users WHERE userid = '" + userid + "'";
 		try (Connection conn = getConnection(); Statement stmt = conn.createStatement();) {
 			ResultSet rs = stmt.executeQuery(sql);
 			MemberVO memVo = null;
 			while (rs.next()) {
-				memVo = MemberVO.getBuilder().userid(rs.getString("userid"))
-														.usernm(rs.getString("usernm"))
-														.pass(rs.getString("pass"))
-														.reg_dt(rs.getString("reg_dt"))
-														.alias(rs.getString("alias"))
-														.addr1(rs.getString("addr1"))
-														.addr2(rs.getString("addr2"))
-														.zipcode(rs.getString("zipcode"))
-														.filename(rs.getString("filename"))
-														.realfilename(rs.getString("realfilename"))
-														.build();
+				memVo = setMember(rs);
 			}
 			return memVo;
 		} catch(SQLException e) {
@@ -142,14 +128,25 @@ public class MemberDaoImpl implements IMemberDao {
 			ResultSet rs = stmt.executeQuery(sql.toString());
 
 			while (rs.next()) {
-				MemberVO memberVo = MemberVO.getBuilder().userid(rs.getString("userid"))
-														.usernm(rs.getString("usernm"))
-														.build();
+				MemberVO memberVo = setMember(rs);
 				memberList.add(memberVo);
 			}
 			return memberList;
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	public MemberVO setMember(ResultSet rs) throws SQLException {
+		return MemberVO.getBuilder().userid(rs.getString("userid"))
+							.usernm(rs.getString("usernm"))
+							.pass(rs.getString("pass"))
+							.reg_dt(rs.getString("reg_dt"))
+							.alias(rs.getString("alias"))
+							.addr1(rs.getString("addr1"))
+							.addr2(rs.getString("addr2"))
+							.zipcode(rs.getString("zipcode"))
+							.filename(rs.getString("filename"))
+							.realfilename(rs.getString("realfilename")).build();
 	}
 }
