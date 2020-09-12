@@ -267,7 +267,7 @@ public class MemberVO implements Serializable {
 		}
 		
 		public MemberVO build() {
-			return new MemberVO(userid, usernm, pass, alias, reg_dt, addr1, addr2, zipcode, filename, realfilename);
+			return new MemberVO(userid, usernm, pass, reg_dt, alias, addr1, addr2, zipcode, filename, realfilename);
 		}
 	}
 	
