@@ -7,6 +7,6 @@ public class Contants {
 	public static final String DATABASEPDESCRPIPTION = "DESCRIPTION";
 	
 	public static final String URL = "jdbc:oracle:thin:@localhost:1521:xe";
-	public static final String USER = "PC01";
+	public static final String USER = "pro";
 	public static final String PASSWORD = "java";
 }

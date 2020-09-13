@@ -1,7 +1,6 @@
 package kr.or.ddit.controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -11,8 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import kr.or.ddit.service.IMemberService;
 import kr.or.ddit.service.MemberServiceImpl;
@@ -29,43 +26,25 @@ public class MemberMgmtControllerServlet extends HttpServlet {
 	
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		String accept = req.getHeader("Accept");
+		String command = req.getParameter("command");
 		
-		String userid = req.getParameter("userid");
+		List<MemberVO> memberList = service.readMembers(null);
 		
-		String submitType = req.getParameter("");
+		req.setAttribute("memberList", memberList);
 		
-		if(StringUtils.isNotBlank(userid) && StringUtils.containsIgnoreCase(accept, "json")) {
-			resp.setContentType("application/json;charset=UTF-8");
-			MemberVO memVo = service.getMember(userid);
-			
-			ObjectMapper mapper = new ObjectMapper();
-			try (
-					PrintWriter out = resp.getWriter();
-			) {
-				mapper.writeValue(out, memVo);
+		StringBuffer url = new StringBuffer("/WEB-INF/");
+		if(StringUtils.isNotBlank(command)) {
+			if("insert".equals(command)) {
+				url.append("MemberInsert.jsp");
+			} else if("update".equals(command)) {
+				url.append("MemberUpdate.jsp");
+			} else if("select".equals(command)) {
+				url.append("MemberList.jsp");
 			}
 		} else {
-			List<MemberVO> memberList = service.readMembers(null);
-			
-			req.setAttribute("memberList", memberList);
-			
-			req.getRequestDispatcher("/WEB-INF/MemberMgmt.jsp").forward(req, resp);
+			url.append("MemberMgmt.jsp");
 		}
+		
+		req.getRequestDispatcher(url.toString()).forward(req, resp);
 	}
-	
-/*	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		if(StringUtils.isNotBlank(userid) && StringUtils.containsIgnoreCase(accept, "json")) {
-			resp.setContentType("application/json;charset=UTF-8");
-			MemberVO memVo = service.getMember(userid);
-			
-			ObjectMapper mapper = new ObjectMapper();
-			try (
-					PrintWriter out = resp.getWriter();
-			) {
-				mapper.writeValue(out, memVo);
-			}
-		}
-	}
-*/}
+}

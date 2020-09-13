@@ -7,11 +7,13 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width", initial-scale="1">
+<link rel="stylesheet" href="css/bootstrap.css">
 <title>회원 관리</title>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery-3.5.1.min.js"></script>
 <script type="text/javascript">
 	$(function() {
-		var inputs = $(".btn");
+		/* var inputs = $(".btn");
 		var mainForm = $("#mainForm");
 		var subForm = $("#subForm");
 		
@@ -45,7 +47,7 @@
 			let command = writeDiv.find("[name='command']");
 		}); */
 		
-		tds.on("click", function() {
+		/* tds.on("click", function() {
 			tds.css("background-color", "white");
 			
 			userid = $(this).attr("class");
@@ -118,103 +120,36 @@
 					console.log(errorResp);
 				}
 			})
+		}); */
+		
+		var command = $("[name='command']");
+		$("[name='insert']").on("click", function() {
+			command.val("insert");
 		});
 		
-		subForm.on("submit", function(event) {
-			console.log(this);
-			event.preventDefault();
-			
+		$("[name='update']").on("click", function() {
+			command.val("update");
+		});
+		
+		$("[name='select']").on("click", function() {
+			command.val("select");
 		});
 	});
 </script>
-<style type="text/css">
-
-table {
-	border-collapse: collapse;
-	border-color: lightgray;
-}
-
-th {
-	background-color: lightblue;
-	height: 50px;
-}
-
-td {
-	width: 150px;
-	height: 80px;
-}
-
-#mainField {
-	width: 18%;
-	padding : 20px;
-	text-align: center;
-	float: left;
-}
-
-#subFiled {
-	width: 20%;
-	padding : 20px;
-}
-
-input {
-	margin: 10px;
-}
-</style>
 </head>
-<%
-	List<MemberVO> memberList = (List<MemberVO>) request.getAttribute("memberList");
-%>
 <body>
-	<fieldset id="mainField">
-		<legend>회원 관리</legend>
-		<table border="1">
-			<thead>
-				<tr>
-					<th>아이디</th>
-					<th>이름</th>
-					<th>별명</th>
-					<th>등록 날짜</th>
-					<th></th>
-				</tr>
-			</thead>
-			<tbody>
-				<%
-					for (MemberVO memVo : memberList) {
-				%>
-				<tr>
-					<td class="<%=memVo.getUserid()%>"><%=Objects.toString(memVo.getUserid(), "")%></td>
-					<td class="<%=memVo.getUserid()%>"><%=Objects.toString(memVo.getUsernm(), "")%></td>
-					<td class="<%=memVo.getUserid()%>"><%=Objects.toString(memVo.getAlias(), "")%></td>
-					<td class="<%=memVo.getUserid()%>"><%=Objects.toString(memVo.getReg_dt(), "")%></td>
-					<td class="<%=memVo.getUserid()%>"><input type="button" value="삭제" /></td>
-				</tr>
-				<%
-					}
-				%>
-			</tbody>
-		</table>
-	</fieldset>
-	<fieldset id="subFiled">
-		<legend>입력</legend>
-		<form id="subForm" action="<%= request.getContextPath() %>/MemberMgmt.do" method="post">
-			<input type="text" name="userid" placeholder="아이디" />
-			<input id="idcheck" type="button" value="중복체크"/>
-			<input type="text" name="usernm" placeholder="이름" />
-			<input type="password" name="pass" placeholder="비밀번호" />
-			<input type="text" name="alias" placeholder="별명" />
-			<input type="text" name="addr1" placeholder="주소" />
-			<input type="text" name="addr2" placeholder="상세주소" />
-			<input type="text" name="zipcode" placeholder="우편번호" />
-			<input type="text" name="filename" placeholder="파일명" />
-			<input type="text" name="realfilename" placeholder="실제파일명" /> <br>
-			<input type="hidden" name="type" />
-			
-			<input class="btn" type="submit" name="insert" value="등록" />
-			<input class="btn" type="submit" name="update" value="수정" />
-			<input class="btn" type="submit" name="delete" value="삭제" />
-			<input class="btn" type="submit" name="select" value="조회" /> <br>
-			<input type="reset" value="취소" />
-		</form>
-	</fieldset>
+	<div class="container">
+		<div class="col-lg-6">
+			<div class="jumbotron" style="padding-top: 20px; margin-top: 20px;">
+				<form id="" action="<%= request.getContextPath() %>/MemberMgmt.do" method="get">
+					<h3 style="text-align: center;">회원 관리</h3>
+					<input type="hidden" name="command" />
+					<input type="submit" class="btn btn-outline-danger command" style="margin: 15px;" name="insert" value="회원 등록">
+					<input type="submit" class="btn btn-outline-danger command" style="margin: 15px;" name="update" value="회원 수정">
+					<input type="submit" class="btn btn-outline-danger command" style="margin: 15px;" name="select" value="회원 조회">
+				</form>
+			</div>
+		</div>
+	</div>
 </body>
 </html>
