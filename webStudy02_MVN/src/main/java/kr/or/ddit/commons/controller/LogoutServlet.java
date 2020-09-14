@@ -1,4 +1,4 @@
-package kr.or.ddit.commons;
+package kr.or.ddit.commons.controller;
 
 import java.io.IOException;
 

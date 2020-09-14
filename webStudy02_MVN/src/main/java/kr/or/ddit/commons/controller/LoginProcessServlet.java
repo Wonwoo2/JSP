@@ -1,4 +1,4 @@
-package kr.or.ddit.commons;
+package kr.or.ddit.commons.controller;
 
 import java.io.IOException;
 
@@ -12,8 +12,12 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 
+import kr.or.ddit.commons.service.AuthenticateServiceImpl;
+import kr.or.ddit.commons.service.IAuthenticateService;
+import kr.or.ddit.enumpkg.ServiceResult;
 import kr.or.ddit.utils.CookieUtils;
 import kr.or.ddit.utils.CookieUtils.TextType;
+import kr.or.ddit.vo.MemberVO;
 
 @WebServlet("/login/loginProcess.do")
 public class LoginProcessServlet extends HttpServlet {
@@ -22,6 +26,8 @@ public class LoginProcessServlet extends HttpServlet {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	private IAuthenticateService service = new AuthenticateServiceImpl();
+	
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 //		1. 요청 파라미터 확보
@@ -51,28 +57,36 @@ public class LoginProcessServlet extends HttpServlet {
 			return;
 		}
 		
+		
 		String goPage = null;
 		boolean redirect = false;
 
 		String msg = null;
 		int maxAge = 0;
-		if (mem_id.equals(mem_pass)) {
+		Object result = service.authenticate(MemberVO.builder().mem_id(mem_id).mem_pass(mem_pass).build());
+		
+		if (result instanceof MemberVO) {
 			goPage = "/";
 			
-			session.setAttribute("mem_id", mem_id);
+			session.setAttribute("authMember", result);
 			
 			if("save".equals(saveId)) {
 				maxAge = 60 * 60 * 24 * 7;
 			}
+			
+			Cookie idCookie = CookieUtils.createCookie("idCookie", mem_id, req.getContextPath(), maxAge, TextType.PATH);
+			resp.addCookie(idCookie);
 		} else {
 			goPage = "/login/loginForm.jsp";
-			msg = "비번 오류";
 			redirect = true;
+			
+			if (ServiceResult.NOTEXIST == result) {
+				msg = mem_id + "에 해당하는 회원이 없습니다.";
+			} else {
+				msg = "비밀번호가 틀렸습니다.";
+			}
 			session.setAttribute("msg", msg);
 		}
-
-		Cookie idCookie = CookieUtils.createCookie("idCookie", mem_id, req.getContextPath(), maxAge, TextType.PATH);
-		resp.addCookie(idCookie);
 		
 		if (redirect) {
 			resp.sendRedirect(req.getContextPath() + goPage);

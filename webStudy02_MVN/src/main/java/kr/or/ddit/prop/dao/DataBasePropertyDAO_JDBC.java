@@ -11,23 +11,11 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import kr.or.ddit.Contants;
+import kr.or.ddit.db.ConnectionFactory;
 import kr.or.ddit.vo.DataBasePropertyVO;
 
 public class DataBasePropertyDAO_JDBC implements IDataBasePropertyDAO {
 	
-	static {
-		try {
-			Class.forName("oracle.jdbc.driver.OracleDriver");
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public Connection getConnection() throws SQLException {
-		Connection conn = DriverManager.getConnection(Contants.URL, Contants.USER, Contants.PASSWORD);
-		return conn;
-	}
-
 	@Override
 	public List<DataBasePropertyVO> selectDataBaseProperties(DataBasePropertyVO param) {
 		
@@ -62,7 +50,7 @@ public class DataBasePropertyDAO_JDBC implements IDataBasePropertyDAO {
 		}
 		
 		List<DataBasePropertyVO> dbPropertyList = new ArrayList<>();
-		try (	Connection conn = getConnection();
+		try (	Connection conn = ConnectionFactory.getConnection();
 				Statement stmt = conn.createStatement();) {
 			
 			ResultSet rs = stmt.executeQuery(sql.toString());
@@ -83,7 +71,7 @@ public class DataBasePropertyDAO_JDBC implements IDataBasePropertyDAO {
 	public List<String> selectAllProperty_names() {
 		String sql = "SELECT PROPERTY_NAME FROM DATABASE_PROPERTIES";
 		List<String> propertyNameList = new ArrayList<>();
-		try (	Connection conn = getConnection();
+		try (	Connection conn = ConnectionFactory.getConnection();
 				Statement stmt = conn.createStatement();) {
 			
 			ResultSet rs = stmt.executeQuery(sql);

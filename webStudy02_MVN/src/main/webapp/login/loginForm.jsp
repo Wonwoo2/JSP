@@ -35,7 +35,6 @@
 		<li>
 			아이디 : <input type="text" name="mem_id" value="<%= Objects.toString(saveId, "") %>"/>
 			<label><input type="checkbox" name="saveId" value="save" <%= saveId != null ? "checked" : "" %>/> 아이디 기억하기 </label>
-			<input type="hidden" name="yn" value="n" />
 		</li>
 		<li>
 			비밀번호 : <input type="password" name="mem_pass" />
