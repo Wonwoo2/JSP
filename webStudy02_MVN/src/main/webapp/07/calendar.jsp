@@ -49,7 +49,7 @@
 
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 	int intToday = Integer.parseInt(sdf.format(cal.getTime()));
-	
+
 	cal.set(year, month, 1);
 
 	cal.add(Calendar.MONTH, -1);
@@ -102,13 +102,13 @@ table {
 		data-month="<%=beforeMonth%>"><b>&lt;</b></a>
 	<%=year%>,
 	<%=months[month]%>
-	<a id="nextBtn" data-year="<%=nextYear%>"
-		data-month="<%=nextMonth%>"><b>&gt;</b></a> <br>
+	<a id="nextBtn" data-year="<%=nextYear%>" data-month="<%=nextMonth%>"><b>&gt;</b></a>
+	<br>
 </div>
-<form id="calendarForm" action="post">
-	<input type="hidden" name="service" value="CALENDAR" /> year : <input
-		id="year" name="year" type="number" value="<%=year%>" /> month : <select
-		name="monthType" onchange="this.form.submit()">
+<form id="calendarForm" action="#" method="get">
+	<input type="hidden" name="service" value="CALENDAR" /> 
+	year : <input id="year" name="year" type="number" value="<%=year%>" /> 
+	month : <select name="monthType" onchange="this.form.submit()">
 		<%
 			pattern = "<option value=\"%d\">%s</option>\n";
 			for (int i = 0; i < months.length - 1; i++) {
@@ -119,7 +119,8 @@ table {
 				}
 			}
 		%>
-	</select> <select name="languageType" onchange="this.form.submit()">
+	</select> 
+	<select name="languageType" onchange="this.form.submit()">
 		<%
 			pattern = "<option value=\"%s\">%s(%s)</option>\n";
 			for (Locale locale : Locale.getAvailableLocales()) {
@@ -135,7 +136,8 @@ table {
 				}
 			}
 		%>
-	</select> <select name="timeOutType" onchange="this.form.submit()">
+	</select> 
+	<select name="timeOutType" onchange="this.form.submit()">
 		<%
 			pattern = "<option value=\"%s\">%s</option>\n";
 			String[] ids = TimeZone.getAvailableIDs();

@@ -1,8 +1,11 @@
 package kr.or.ddit.member.controller;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -10,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import kr.or.ddit.enumpkg.ServiceResult;
@@ -19,338 +23,137 @@ import kr.or.ddit.vo.MemberVO;
 
 @WebServlet("/registMember.do")
 public class MemberRegistControllerServlet extends HttpServlet {
-	
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	private IMemberService service = MemberServiceImpl.getInstance();
-	
+
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		req.getRequestDispatcher("/WEB-INF/views/member/registForm.jsp").forward(req, resp);
 	}
-	
+
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		Map<String, Object> errors = new LinkedHashMap<String, Object>();
-		MemberVO member = null;
-		boolean valid = validation(req, errors, member);
-		
-		if (!valid) {
-			resp.sendError((int) errors.get("statusCode"), (String) errors.get("msg"));
-			return;
+		// 1. 요청 분석
+		MemberVO member = new MemberVO();
+		req.setAttribute("member", member);
+		req.setCharacterEncoding("UTF-8");
+		Map<String, String[]> paramMap = req.getParameterMap();
+		try {
+			BeanUtils.populate(member, paramMap);
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			e.printStackTrace();
 		}
+
+		// 2. 검증(DB 스키마 구조 참고)
+		Map<String, StringBuffer> errors = new LinkedHashMap<>();
+		req.setAttribute("errors", errors);
+		boolean valid = validation(member, errors);
 		
-		String mem_id = req.getParameter("mem_id");
-		String mem_pass = req.getParameter("mem_pass");
-		String mem_name = req.getParameter("mem_name");
-		String mem_regno1 = req.getParameter("mem_regno1");
-		String mem_regno2 = req.getParameter("mem_regno2");
-		String mem_bir = req.getParameter("mem_bir");
-		String mem_zip = req.getParameter("mem_zip");
-		String mem_add1 = req.getParameter("mem_add1");
-		String mem_add2 = req.getParameter("mem_add2");
-		String mem_hometel = req.getParameter("mem_hometel");
-		String mem_comtel = req.getParameter("mem_comtel");
-		String mem_hp = req.getParameter("mem_hp");
-		String mem_job = req.getParameter("mem_job");
-		String mem_like = req.getParameter("mem_like");
-		String mem_memorial = req.getParameter("mem_memorial");
-		String mem_memorialday = req.getParameter("mem_memorialday");
-		String mem_mileage = req.getParameter("mem_mileage");
-		String mem_delete = req.getParameter("mem_delete");
 		
-		member = new MemberVO();
-		member.setMem_id(mem_id);
-		member.setMem_pass(mem_pass);
-		member.setMem_name(mem_name);
-		member.setMem_regno1(mem_regno1);
-		member.setMem_regno2(mem_regno2);
-		member.setMem_bir(mem_bir);
-		member.setMem_zip(mem_zip);
-		member.setMem_add1(mem_add1);
-		member.setMem_add2(mem_add2);
-		member.setMem_hometel(mem_hometel);
-		member.setMem_comtel(mem_comtel);
-		member.setMem_hp(mem_hp);
-		member.setMem_job(mem_job);
-		member.setMem_like(mem_like);
-		member.setMem_memorial(mem_memorial);
-		member.setMem_memorialday(mem_memorialday);
-		member.setMem_mileage(Integer.parseInt(mem_mileage));
-		member.setMem_delete(mem_delete);
-		
-		ServiceResult result = service.registMember(member);
+		// 3. 통과
+		// 4. 통과한 경우, 로직을 이용한 등록
+		String msg = null;
 		String goPage = null;
 		boolean redirect = false;
-		if (ServiceResult.OK == result) {
-			redirect = true;
-			goPage = "/";
-		} else if (ServiceResult.FAILED == result) {
-			req.setAttribute("authMember", member);
-			goPage = "/registMember.do";
-		} else if (ServiceResult.PKDUPLICATED == result) {
-			redirect = true;
-			req.setAttribute("authMember", member);
-			goPage = "/registMember.do";
+		if (valid) {
+			ServiceResult result = service.registMember(member);
+			
+			switch (result) {
+			case PKDUPLICATED:
+				goPage = "/WEB-INF/views/member/registForm.jsp";
+				msg = "아이디 중복, 확인 후 다시 넣으세요.";
+				break;
+			case FAILED:
+				goPage = "/WEB-INF/views/member/registForm.jsp";
+				msg = "서버 문제로 등록이 완료되지 않았습니다. 잠시 후 다시 시도해주세요.";
+				break;
+			default:
+				goPage = "/login/loginForm.jsp";
+				redirect = true;
+				break;
+			}
+		} else {
+			goPage = "/WEB-INF/views/member/registForm.jsp";
 		}
 		
+		req.setAttribute("msg", msg);
 		if (redirect) {
-			resp.sendRedirect(req.getContextPath() + goPage);
+			resp.sendRedirect(req.getContextPath() +  goPage);
 		} else {
 			req.getRequestDispatcher(goPage).forward(req, resp);
 		}
 		
+		/*
+		 * -- reflection 코드 --
+		 * 
+		 * for (Entry<String, String[]> entry : paramMap.entrySet()) { String paramName
+		 * = entry.getKey(); String[] paramValue = entry.getValue();
+		 * 
+		 * Class<?> clzType = member.getClass(); try { Field field =
+		 * clzType.getDeclaredField(paramName); field.setAccessible(true);
+		 * 
+		 * Class<?> fieldType = field.getType(); if
+		 * (String.class.isAssignableFrom(fieldType)) { field.set(member,
+		 * paramValue[0]); } else if (Number.class.isAssignableFrom(fieldType)) { Number
+		 * number = (Number) fieldType.newInstance(); Method method =
+		 * fieldType.getDeclaredMethod("parseInt", String.class); number = (Number)
+		 * method.invoke(number, paramValue[0]); field.set(member, number); }
+		 * 
+		 * } catch (NoSuchFieldException | SecurityException | IllegalArgumentException
+		 * | IllegalAccessException | InstantiationException | InvocationTargetException
+		 * | NoSuchMethodException e) { continue; } }
+		 */
+
 	}
 
-	public boolean validation(HttpServletRequest req, Map<String, Object> errors, MemberVO member) {
-		String mem_id = req.getParameter("mem_id");
-		String mem_pass = req.getParameter("mem_pass");
-		String mem_name = req.getParameter("mem_name");
-		String mem_regno1 = req.getParameter("mem_regno1");
-		String mem_regno2 = req.getParameter("mem_regno2");
-		String mem_bir = req.getParameter("mem_bir");
-		String mem_zip = req.getParameter("mem_zip");
-		String mem_add1 = req.getParameter("mem_add1");
-		String mem_add2 = req.getParameter("mem_add2");
-		String mem_hometel = req.getParameter("mem_hometel");
-		String mem_comtel = req.getParameter("mem_comtel");
-		String mem_hp = req.getParameter("mem_hp");
-		String mem_job = req.getParameter("mem_job");
-		String mem_like = req.getParameter("mem_like");
-		String mem_memorial = req.getParameter("mem_memorial");
-		String mem_memorialday = req.getParameter("mem_memorialday");
-		String mem_mileage = req.getParameter("mem_mileage");
-		String mem_delete = req.getParameter("mem_delete");
-		
-		int statusCode = 200;
-		if (StringUtils.isBlank(mem_id)) {
-			statusCode = 405;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "아이디를 입력하지 않았습니다.");
-			return false;
+	public boolean validation(MemberVO member, Map<String, StringBuffer> errors) {
+		// 타입, 필수 여부, 길이, 형식
+		boolean valid = true;
+		if (StringUtils.isBlank(member.getMem_id())) {
+			valid = false;
+			errors.put("mem_id", new StringBuffer("아이디 필수데이터 누락"));
 		}
-		if (StringUtils.isBlank(mem_pass)) {
-			statusCode = 405;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "비밀번호를 입력하지 않았습니다.");
-			return false;
+		if (StringUtils.isBlank(member.getMem_pass())) {
+			valid = false;
+			errors.put("mem_pass", new StringBuffer("비밀번호 필수데이터 누락"));
 		}
-		if (StringUtils.isBlank(mem_name)) {
-			statusCode = 405;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "회원명를 입력하지 않았습니다.");
-			return false;
+		if (StringUtils.isBlank(member.getMem_name())) {
+			valid = false;
+			errors.put("mem_name", new StringBuffer("회원명 필수데이터 누락"));
 		}
-		if (StringUtils.isBlank(mem_regno1)) {
-			statusCode = 405;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "주민번호1를 입력하지 않았습니다.");
-			return false;
+		if (StringUtils.isBlank(member.getMem_regno1())) {
+			valid = false;
+			errors.put("mem_regno1", new StringBuffer("주민번호1 필수데이터 누락"));
 		}
-		if (StringUtils.isBlank(mem_regno2)) {
-			statusCode = 405;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "주민번호2를 입력하지 않았습니다.");
-			return false;
+		if (StringUtils.isBlank(member.getMem_regno2())) {
+			valid = false;
+			errors.put("mem_regno2", new StringBuffer("주민번호2 필수데이터 누락"));
 		}
-		if (StringUtils.isBlank(mem_bir)) {
-			statusCode = 405;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "생일를 입력하지 않았습니다.");
-			return false;
+		if (StringUtils.isBlank(member.getMem_zip())) {
+			valid = false;
+			errors.put("mem_zip", new StringBuffer("우편번호 필수데이터 누락"));
 		}
-		if (StringUtils.isBlank(mem_zip)) {
-			statusCode = 405;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "우편번호를 입력하지 않았습니다.");
-			return false;
+		if (StringUtils.isBlank(member.getMem_add1())) {
+			valid = false;
+			errors.put("mem_add1", new StringBuffer("주소1 필수데이터 누락"));
 		}
-		if (StringUtils.isBlank(mem_add1)) {
-			statusCode = 405;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "주소1를 입력하지 않았습니다.");
-			return false;
+		if (StringUtils.isBlank(member.getMem_add2())) {
+			valid = false;
+			errors.put("mem_add2", new StringBuffer("주소2 필수데이터 누락"));
 		}
-		if (StringUtils.isBlank(mem_add2)) {
-			statusCode = 405;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "주소2를 입력하지 않았습니다.");
-			return false;
+		if (StringUtils.isBlank(member.getMem_hometel())) {
+			valid = false;
+			errors.put("mem_hometel", new StringBuffer("집전화번호 필수데이터 누락"));
 		}
-		if (StringUtils.isBlank(mem_hometel)) {
-			statusCode = 405;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "집전화번호를 입력하지 않았습니다.");
-			return false;
+		if (StringUtils.isBlank(member.getMem_comtel())) {
+			valid = false;
+			errors.put("mem_comtel", new StringBuffer("회사전화번호 필수데이터 누락"));
 		}
-		if (StringUtils.isBlank(mem_comtel)) {
-			statusCode = 405;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "회사전화번호를 입력하지 않았습니다.");
-			return false;
-		}
-		if (StringUtils.isBlank(mem_hp)) {
-			statusCode = 405;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "휴대폰번호를 입력하지 않았습니다.");
-			return false;
-		}
-		if (StringUtils.isBlank(mem_job)) {
-			statusCode = 405;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "직업를 입력하지 않았습니다.");
-			return false;
-		}
-		if (StringUtils.isBlank(mem_like)) {
-			statusCode = 405;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "취미를 입력하지 않았습니다.");
-			return false;
-		}
-		if (StringUtils.isBlank(mem_memorial)) {
-			statusCode = 405;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "기념일를 입력하지 않았습니다.");
-			return false;
-		}
-		if (StringUtils.isBlank(mem_memorialday)) {
-			statusCode = 405;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "기념일자를 입력하지 않았습니다.");
-			return false;
-		}
-		if (StringUtils.isBlank(mem_mileage)) {
-			statusCode = 405;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "마일리지를 입력하지 않았습니다.");
-			return false;
-		}
-		if (StringUtils.isBlank(mem_delete)) {
-			statusCode = 405;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "탈퇴여부를 입력하지 않았습니다.");
-			return false;
-		}
-		
-		
-		if (StringUtils.isBlank(mem_id)) {
-			statusCode = 400;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "아이디 길이가 초과입니다.");
-		}
-		
-		if (mem_id.length() > 15) {
-			statusCode = 400;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "아이디 길이가 초과입니다.");
-			return false;
-		}
-		if (mem_pass.length() > 15) {
-			statusCode = 400;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "비밀번호 길이가 초과입니다.");
-			return false;
-		}
-		if (mem_name.length() > 20) {
-			statusCode = 400;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "이름 길이가 초과입니다.");
-			return false;
-		}
-		if (mem_regno1.length() > 6) {
-			statusCode = 400;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "주민번호1 길이가 초과입니다.");
-			return false;
-		}
-		if (mem_regno2.length() > 7) {
-			statusCode = 400;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "주민번호2 길이가 초과입니다.");
-			return false;
-		}
-		if (mem_bir.length() > 7) {
-			statusCode = 400;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "생일 길이가 초과입니다.");
-			return false;
-		}
-		if (mem_zip.length() > 7) {
-			statusCode = 400;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "우편번호 길이가 초과입니다.");
-			return false;
-		}
-		if (mem_add1.length() > 100) {
-			statusCode = 400;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "주소1 길이가 초과입니다.");
-			return false;
-		}
-		if (mem_add2.length() > 80) {
-			statusCode = 400;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "주소2 길이가 초과입니다.");
-			return false;
-		}
-		if (mem_hometel.length() > 14) {
-			statusCode = 400;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "집전화번호 길이가 짧습니다.");
-			return false;
-		}
-		if (mem_comtel.length() > 14) {
-			statusCode = 400;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "회사 전화번호 길이가 짧습니다.");
-			return false;
-		}
-		if (mem_hp.length() > 15) {
-			statusCode = 400;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "휴대폰 번호 길이가 짧습니다.");
-			return false;
-		}
-		if (mem_job.length() > 40) {
-			statusCode = 400;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "직업 길이가 짧습니다.");
-			return false;
-		}
-		if (mem_like.length() > 40) {
-			statusCode = 400;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "취미 길이가 초과입니다.");
-			return false;
-		}
-		if (mem_memorial.length() > 40) {
-			statusCode = 400;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "기념일 길이가 초과입니다.");
-			return false;
-		}
-		if (mem_memorialday.length() > 7) {
-			statusCode = 400;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "기념일 날짜 길이가 초과입니다.");
-			return false;
-		}
-		if (mem_mileage.length() > 22) {
-			statusCode = 400;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "마일리지 길이가 초과입니다.");
-			return false;
-		}
-		if (mem_delete.length() > 1) {
-			statusCode = 400;
-			errors.put("statusCode", statusCode);
-			errors.put("msg", "탈퇴여부 길이가 초과입니다.");
-			return false;
-		}
-		
-		return true;
+		return valid;
 	}
 }

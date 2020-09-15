@@ -34,7 +34,7 @@ public class MemberDAOImpl implements IMemberDAO {
 		StringBuffer sql = new StringBuffer(); 
 		sql.append("INSERT INTO member(mem_id, mem_pass, mem_name, mem_regno1, mem_regno2, mem_bir, mem_zip, mem_add1, mem_add2, mem_hometel, ");
 		sql.append("mem_comtel, mem_hp, mem_job, mem_like, mem_memorial, mem_memorialday, mem_mileage, mem_delete)");
-		sql.append("VALUES(?, ?, ?, ?, ?, TO_DATE(?, 'YYYY-MM-DD'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+		sql.append("VALUES(?, ?, ?, ?, ?, TO_DATE(?, 'YYYY-MM-DD'), ?, ?, ?, ?, ?, ?, ?, ?, ?, TO_DATE(?, 'YYYY-MM-DD'), ?, ?)");
 				
 		try (
 			Connection conn = ConnectionFactory.getConnection();
@@ -42,17 +42,12 @@ public class MemberDAOImpl implements IMemberDAO {
 		) {
 			int idx = 1;
 
-			SimpleDateFormat transFormat = new SimpleDateFormat("yyMMdd");
-			
-			Date memorialDate = transFormat.parse(member.getMem_memorialday());
-			Date birDate = transFormat.parse(member.getMem_bir());
-			
 			pstmt.setString(idx++, member.getMem_id());
 			pstmt.setString(idx++, member.getMem_pass());
 			pstmt.setString(idx++, member.getMem_name());
 			pstmt.setString(idx++, member.getMem_regno1());
 			pstmt.setString(idx++, member.getMem_regno2());
-			pstmt.setDate(idx++, new java.sql.Date(birDate.getTime()));
+			pstmt.setString(idx++, member.getMem_bir());
 			pstmt.setString(idx++, member.getMem_zip());
 			pstmt.setString(idx++, member.getMem_add1());
 			pstmt.setString(idx++, member.getMem_add2());
@@ -62,12 +57,12 @@ public class MemberDAOImpl implements IMemberDAO {
 			pstmt.setString(idx++, member.getMem_job());
 			pstmt.setString(idx++, member.getMem_like());
 			pstmt.setString(idx++, member.getMem_memorial());
-			pstmt.setDate(idx++, new java.sql.Date(memorialDate.getTime()));
+			pstmt.setString(idx++, member.getMem_memorialday());
 			pstmt.setInt(idx++, member.getMem_mileage());
 			pstmt.setString(idx++, member.getMem_delete());
 			
 			return pstmt.executeUpdate();
-		} catch (SQLException | ParseException e) {
+		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -76,10 +71,10 @@ public class MemberDAOImpl implements IMemberDAO {
 	public List<MemberVO> selectMemberList() {
 		StringBuffer sql = new StringBuffer();
 		sql.append(" SELECT mem_id, mem_pass, mem_name,                   ");
-		sql.append(" mem_regno1, mem_regno2, mem_bir,                     ");
+		sql.append(" mem_regno1, mem_regno2, TO_CHAR(mem_bir, 'YYYY-MM-DD') AS mem_bir,");
 		sql.append(" mem_zip, mem_add1, mem_add2, mem_hometel,            ");
 		sql.append(" mem_comtel, mem_hp, mem_job, mem_like, mem_memorial, ");
-		sql.append(" mem_memorialday, mem_mileage, mem_delete             ");
+		sql.append(" TO_CHAR(mem_memorialday, 'YYYY-MM-DD') AS mem_memorialday, mem_mileage, mem_delete             ");
 		sql.append(" FROM member                                          ");
 		
 		try (Connection conn = ConnectionFactory.getConnection();
@@ -121,10 +116,10 @@ public class MemberDAOImpl implements IMemberDAO {
 	public MemberVO selectMember(String mem_id) {
 		StringBuffer sql = new StringBuffer();
 		sql.append(" SELECT mem_id, mem_pass, mem_name,                   ");
-		sql.append(" mem_regno1, mem_regno2, mem_bir,                     ");
+		sql.append(" mem_regno1, mem_regno2, TO_CHAR(mem_bir, 'YYYY-MM-DD') AS mem_bir, ");
 		sql.append(" mem_zip, mem_add1, mem_add2, mem_hometel,            ");
 		sql.append(" mem_comtel, mem_hp, mem_job, mem_like, mem_memorial, ");
-		sql.append(" mem_memorialday, mem_mileage, mem_delete             ");
+		sql.append(" TO_CHAR(mem_memorialday, 'YYYY-MM-DD') AS mem_memorialday, mem_mileage, mem_delete ");
 		sql.append(" FROM member                                          ");
 		sql.append(" WHERE mem_id = ?");
 	    
@@ -176,6 +171,8 @@ public class MemberDAOImpl implements IMemberDAO {
 				Connection conn = ConnectionFactory.getConnection();
 				PreparedStatement pstmt = conn.prepareStatement(sql.toString());
 		) {
+			
+			
 			int idx = 1;
 			pstmt.setString(idx++, member.getMem_id());
 			pstmt.setString(idx++, member.getMem_pass());

@@ -5,25 +5,25 @@ public class CustomException extends RuntimeException{
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	public static final long serialVersionUID = 1L;
 
-	private CustomException() {
+	public CustomException() {
 		super();
 	}
 
-	private CustomException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+	public CustomException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
 	}
 
-	private CustomException(String message, Throwable cause) {
+	public CustomException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	private CustomException(String message) {
+	public CustomException(String message) {
 		super(message);
 	}
 
-	private CustomException(Throwable cause) {
+	public CustomException(Throwable cause) {
 		super(cause);
 	}
 }

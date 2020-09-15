@@ -5,6 +5,7 @@ import java.util.List;
 import kr.or.ddit.commons.service.AuthenticateServiceImpl;
 import kr.or.ddit.commons.service.IAuthenticateService;
 import kr.or.ddit.enumpkg.ServiceResult;
+import kr.or.ddit.exception.CustomException;
 import kr.or.ddit.member.dao.IMemberDAO;
 import kr.or.ddit.member.dao.MemberDAOImpl;
 import kr.or.ddit.vo.MemberVO;
@@ -29,7 +30,7 @@ public class MemberServiceImpl implements IMemberService {
 	@Override
 	public ServiceResult registMember(MemberVO member) {
 		ServiceResult result = null;
-		if (authService.authenticate(member) == null) {
+		if (memberDao.selectMember(member.getMem_id()) != null) {
 			result = ServiceResult.PKDUPLICATED;
 		} else {
 			if(memberDao.insertMember(member) > 0) {
@@ -48,7 +49,11 @@ public class MemberServiceImpl implements IMemberService {
 
 	@Override
 	public MemberVO retrieveMember(String mem_id) {
-		return memberDao.selectMember(mem_id);
+		MemberVO savedMember = memberDao.selectMember(mem_id);
+		if (savedMember == null) {
+			throw new CustomException(mem_id + "는 존재하지 않는 아이디입니다.");
+		}
+		return savedMember;
 	}
 
 	@Override
@@ -78,8 +83,6 @@ public class MemberServiceImpl implements IMemberService {
 			result = ServiceResult.NOTEXIST;
 		} else {
 			if (authMember.equals(member)) {
-				result = ServiceResult.PKDUPLICATED;
-			} else {
 				int deleteResult = memberDao.deleteMember(member.getMem_id());
 				if (deleteResult > 0) {
 					result = ServiceResult.OK;
