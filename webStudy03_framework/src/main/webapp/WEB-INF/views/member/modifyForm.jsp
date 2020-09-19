@@ -37,7 +37,7 @@
 				<div class="form-group row">
 					<label class="col-md-4">우편번호</label>
 					<input type="text" name="mem_zip" value="${ member.getMem_zip() }" maxlength="7" readonly required />
-					<button type="button" class="btn btn-dark ml-2 mb-2" data-toggle="modal" data-target="#searchZipModal">우편번호 검색</button>
+					<button type="button" class="btn btn-dark ml-2 mb-2" data-toggle="modal" data-target="#zipSearchModal">우편번호 검색</button>
 				</div>
 				<div class="form-group row">
 					<label class="col-md-4">주소</label>
@@ -90,8 +90,31 @@
 			</div>
 		</div>
 	</form>
+					
+	<div id="modalDiv">
+	</div>
 </body>
+<script type="text/javascript" src="<%=request.getContextPath() %>/js/zip.js"></script>
 <script type="text/javascript">
-	$("input").addClass("form-control").addClass("mb-2");
+	$(function() {
+		let modalDiv = $("#modalDiv");
+		let zipcode = $("[name='mem_zip']");
+		let addr1 = $("[name='mem_add1']");
+		let addr2 = $("[name='mem_add2']");
+		
+		let tag = {};
+		tag.modalDiv = modalDiv;
+		tag.zipcode = zipcode;
+		tag.addr1 = addr1;
+		tag.addr2 = addr2;
+		
+		$("input").addClass("form-control").addClass("mb-2");
+		$("#modifyForm").zipSearch({
+			tag : tag,
+			command : "modify",
+			url : "<%= request.getContextPath() %>/dataTable.do",
+		});
+		
+	});
 </script>
 </html>
