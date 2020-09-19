@@ -56,11 +56,13 @@ public class DataTableController extends HttpServlet {
 		
 		pagingVo.setTotalRecord(totalCount);
 		pagingVo.setCurrentPage(currentPage);
+		
 		List<ZipVO> zipList = dao.selectZipList(pagingVo);
 		
 		Map<String, Object> target = new HashMap<>();
+		
 		target.put("draw", draw);
-		target.put("recordsTotla", totalCount);
+		target.put("recordsTotal", totalCount);
 		target.put("recordsFiltered", totalSearchCount);
 		target.put("data", zipList);
 		
