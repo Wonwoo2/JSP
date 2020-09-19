@@ -312,49 +312,26 @@
 			</div>
 		</div>
 	</form>
-	<script type="text/javascript" src="<%=request.getContextPath() %>/js/searchZip.js?<%=new Date().getTime()%>"></script>
+	<div id="modalDiv">
+	</div>
+	<script type="text/javascript" src="<%=request.getContextPath() %>/js/zip.js"></script>
 	<script type="text/javascript">
-		$("registForm").searchZip({
-			url : "<%= request.getContextPath() %>/zipSearch.do",
-			zipCodeTag : "[name='mem_zip']",
-			address1Tag : "[name='mem_add1']",
-			address2Tag : "[name='mem_add2']"
+		let modalDiv = $("#modalDiv");
+		let zipcode = $("[name='mem_zip']");
+		let addr1 = $("[name='mem_add1']");
+		let addr2 = $("[name='mem_add2']");
+		
+		let tag = {};
+		tag.modalDiv = modalDiv;
+		tag.zipcode = zipcode;
+		tag.addr1 = addr1;
+		tag.addr2 = addr2;
+		
+		$("registForm").zipSearch({
+			tag : tag,
+			command : "regist",
+			url : "<%= request.getContextPath() %>/dataTable.do",
 		});
 	</script>
-	<%-- <div id="searchZipModal" class="modal fade" role="dialog">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header" style="text-align: center;">
-					<h4 class="modal-title">우편번호 검색</h4>
-				</div>
-				<div class="modal-body">
-					<form id="zipSearchForm"  class="form-inline" action="<%= request.getContextPath() %>/zipSearch.do" method="get">
-						<p>
-							동을 입력하세요.
-							<input class="form-control" type="text" name="dong" required /> 
-							<input id="search" class="btn btn-dark" type="submit" value="검색">
-						</p>
-					</form>
-					<div id="searchResult">
-						<table>
-				   			<thead>
-				   				<tr>
-				   					<th>우편번호</th>
-				   					<th>주소</th>
-				   					<th>번지</th>
-				   				</tr>
-				   			</thead>
-				   			<tbody>
-				   			
-				   			</tbody>
-				   		</table>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</div>
-	</div> --%>
 </body>
 </html>
