@@ -7,22 +7,19 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import kr.or.ddit.enumpkg.OperatorType;
+import kr.or.ddit.mvc.annotation.CommandHandler;
+import kr.or.ddit.mvc.annotation.HttpMethod;
+import kr.or.ddit.mvc.annotation.URIMapping;
 
-@WebServlet("/01/calculate.do")
-public class CalculateServlet extends HttpServlet {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		req.setCharacterEncoding("UTF-8");
+@CommandHandler
+public class CalculateServlet {
+	
+	@URIMapping(value = "/01/calculate.do", method = HttpMethod.GET)
+	public String doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		
 		String accept = req.getHeader("Accept");
 		
@@ -78,6 +75,7 @@ public class CalculateServlet extends HttpServlet {
 		String respText = marshallingType.marshalling(targetMap);
 		out.println(respText);
 		out.close();
+		return null;
 	}
 
 	private interface Marshaller{
@@ -96,9 +94,7 @@ public class CalculateServlet extends HttpServlet {
 				int idx = jsonText.lastIndexOf(",");
 				jsonText.deleteCharAt(idx);
 				jsonText.append("}");
-				// marshalling native -> json/xml
-//				"[\"2*2=4\", 4]"
-//				"{\"result\":4, \"expression\":\"2*2=4\"}"
+				
 				return jsonText.toString();
 			}
 		}), XML("application/xml;charset=UTF-8", (targetMap)->{ 
@@ -125,15 +121,3 @@ public class CalculateServlet extends HttpServlet {
 		}
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-

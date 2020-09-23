@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" version="3.1">
-  <display-name>webStudy02</display-name>
+  <display-name>webStudy03_framework</display-name>
   <welcome-file-list>
     <welcome-file>index.do</welcome-file>
-    <welcome-file>index.html</welcome-file>
-    <welcome-file>index.htm</welcome-file>
-    <welcome-file>index.jsp</welcome-file>
   </welcome-file-list>
   <context-param>
     <param-name>testParam</param-name>
@@ -16,13 +13,35 @@
     <param-value>e:/contents</param-value>
   </context-param>
   <servlet>
+  	<servlet-name>FrontController</servlet-name>
+  	<servlet-class>kr.or.ddit.mvc.FrontController</servlet-class>
+  	<init-param>
+  		<param-name>basePackage</param-name>
+  		<param-value>kr.or.ddit</param-value>
+  	</init-param>
+  	<init-param>
+  		<param-name>prefix</param-name>
+  		<param-value>/WEB-INF/views/</param-value>
+  	</init-param>
+  	<init-param>
+  		<param-name>suffix</param-name>
+  		<param-value>.jsp</param-value>
+  	</init-param>
+  	<load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+  	<servlet-name>FrontController</servlet-name>
+  	<url-pattern>*.do</url-pattern>
+  	<url-pattern>/index.do</url-pattern>
+  </servlet-mapping>
+  <servlet>
     <servlet-name>DescrptionServlet</servlet-name>
     <servlet-class>kr.or.ddit.servlet01.DescrptionServlet</servlet-class>
     <init-param>
       <param-name>initName</param-name>
       <param-value>/eclipse.ini</param-value>
     </init-param>
-    <load-on-startup>1</load-on-startup>
+    <load-on-startup>2</load-on-startup>
   </servlet>
   <servlet-mapping>
     <servlet-name>DescrptionServlet</servlet-name>
@@ -35,7 +54,7 @@
       <param-name>contentsPath</param-name>
       <param-value>e:/contents</param-value>
     </init-param>
-    <load-on-startup>2</load-on-startup>
+    <load-on-startup>3</load-on-startup>
   </servlet>
   <servlet-mapping>
     <servlet-name>ImageListServlet</servlet-name>

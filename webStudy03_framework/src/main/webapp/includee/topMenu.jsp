@@ -30,7 +30,7 @@
 		let action = $(this).data("action");
 
 		menuForm.find("[name='service']").val(service);
-		menuForm.attr("action", "<%= request.getContextPath() %>/" + action);
+		menuForm.attr("action", "<%= request.getContextPath() %>" + action);
 		menuForm.submit();
 		return false;
 	});

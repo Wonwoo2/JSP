@@ -5,8 +5,6 @@ import java.io.PrintWriter;
 import java.util.List;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -14,25 +12,24 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import kr.or.ddit.mvc.annotation.CommandHandler;
+import kr.or.ddit.mvc.annotation.HttpMethod;
+import kr.or.ddit.mvc.annotation.URIMapping;
+import kr.or.ddit.mvc.annotation.resolvers.RequestParameter;
 import kr.or.ddit.prop.service.DataBasePropertyServiceImpl;
 import kr.or.ddit.prop.service.IDataBasePropertyService;
 import kr.or.ddit.vo.DataBasePropertyVO;
 
-@WebServlet("/10/jdbcDesc.do")
-public class DataBasePropertyControllerServlet extends HttpServlet {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+@CommandHandler
+public class DataBasePropertyControllerServlet {
 	
-	IDataBasePropertyService service = new DataBasePropertyServiceImpl();
+	private IDataBasePropertyService service = DataBasePropertyServiceImpl.getInstance(); 
 	
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		String property_name = req.getParameter("property_name");
-		String property_value = req.getParameter("property_value");
-		String description = req.getParameter("description");
-		
+	@URIMapping(value = "/10/jdbcDesc.do", method = HttpMethod.GET)
+	public String doGet(@RequestParameter(name = "property_name", required = true) String property_name,
+				@RequestParameter(name = "property_value", required = true) String property_value,
+				@RequestParameter(name = "description", required = true) String description, 
+				HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String accept = req.getHeader("Accept");
 		
 		DataBasePropertyVO property = DataBasePropertyVO.getBuilder()
@@ -51,14 +48,16 @@ public class DataBasePropertyControllerServlet extends HttpServlet {
 					PrintWriter out = resp.getWriter();
 			) {
 				mapper.writeValue(out, propertyList);
+				return null;
 			}
 		} else {
 			req.setAttribute("property", property);
 			req.setAttribute("propertyList", propertyList);
 			req.setAttribute("propertyNameList", propertyNameList);
 			
-			String goPage = "/WEB-INF/10/jdbcDesc.jsp";
-			req.getRequestDispatcher(goPage).forward(req, resp);
+			String goPage = "10/jdbcDesc";
+			return goPage;
 		}
+		
 	}
 }

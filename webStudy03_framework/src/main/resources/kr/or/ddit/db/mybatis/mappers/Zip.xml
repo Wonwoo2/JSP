@@ -5,16 +5,16 @@
 <mapper namespace="kr.or.ddit.zip.dao.IZipDAO">
 	<sql id="searchFrag">
 		<where>
-			<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(searchWord)">
-				sido LIKE '%' ||#{searchWord}|| '%'
-				OR gugun LIKE '%' ||#{searchWord}|| '%'
-				OR dong LIKE '%' ||#{searchWord}|| '%'
-				OR bunji LIKE '%' ||#{searchWord}|| '%'
+			<if test="searchVo neq null and @org.apache.commons.lang3.StringUtils@isNotBlank(searchVo.searchWord)">
+				INSTR(sido, #{searchVo.searchWord}) > 0
+				OR INSTR(gugun, #{searchVo.searchWord}) > 0
+				OR INSTR(dong, #{searchVo.searchWord}) > 0
+				OR INSTR(bunji, #{searchVo.searchWord}) > 0
 			</if>
 		</where>
 	</sql>
 	<select id="selectTotalCount" parameterType="PagingVO" resultType="int">
-		SELECT COUNT(*) 
+		SELECT COUNT(*)
 		FROM ziptb
 		<include refid="searchFrag" /> 
 	</select>

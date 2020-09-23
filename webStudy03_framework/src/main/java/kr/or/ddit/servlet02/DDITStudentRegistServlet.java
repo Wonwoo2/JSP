@@ -8,24 +8,19 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import kr.or.ddit.mvc.annotation.CommandHandler;
+import kr.or.ddit.mvc.annotation.HttpMethod;
+import kr.or.ddit.mvc.annotation.URIMapping;
 import kr.or.ddit.utils.TemplateUtils;
 
-@WebServlet("/ddit/studentRegist.do")
-public class DDITStudentRegistServlet extends HttpServlet{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+@CommandHandler
+public class DDITStudentRegistServlet {
 
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		req.setCharacterEncoding("UTF-8");
-//		1. getParameter, getParameterValues, getParameterMap
+	@URIMapping(value = "/ddit/studentRegist.do", method = HttpMethod.POST)
+	public String doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		
 		Map<String, String[]> parameterMap = req.getParameterMap();
 		String pattern = "<tr><th>%s</th><td>%s</td></tr>";
@@ -43,5 +38,6 @@ public class DDITStudentRegistServlet extends HttpServlet{
 		PrintWriter out = resp.getWriter();
 		out.println(html);
 		out.close();
+		return null;
 	}
 }

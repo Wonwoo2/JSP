@@ -1,95 +1,73 @@
 package kr.or.ddit.member.controller;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.beanutils.BeanUtils;
+import javax.servlet.http.HttpSession;
 
 import kr.or.ddit.enumpkg.ServiceResult;
 import kr.or.ddit.member.service.IMemberService;
 import kr.or.ddit.member.service.MemberServiceImpl;
+import kr.or.ddit.mvc.annotation.CommandHandler;
+import kr.or.ddit.mvc.annotation.HttpMethod;
+import kr.or.ddit.mvc.annotation.URIMapping;
+import kr.or.ddit.mvc.annotation.resolvers.ModelData;
 import kr.or.ddit.vo.MemberVO;
 
-@WebServlet("/MemberDelete.do")
-public class MemberDeleteController extends HttpServlet {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+@CommandHandler
+public class MemberDeleteController {
 	
 	private IMemberService service = MemberServiceImpl.getInstance();
 	
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		req.setCharacterEncoding("UTF-8");
-		MemberVO authMember = (MemberVO) req.getSession().getAttribute("authMember");
+	@URIMapping(value = "/MemberDelete.do", method = HttpMethod.GET)
+	public String doGet(HttpServletRequest req, HttpServletResponse resp, HttpSession session) throws ServletException, IOException {
+		
+		MemberVO authMember = (MemberVO) session.getAttribute("member");
 		MemberVO member = service.retrieveMember(authMember.getMem_id());
 		
 		req.setAttribute("member", member);
 		
-		String goPage = "/WEB-INF/views/member/deleteForm.jsp";
+		String goPage = "member/deleteForm";
 		
-		req.getRequestDispatcher(goPage).forward(req, resp);
+		return goPage;
 	}
 	
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		req.setCharacterEncoding("UTF-8");
-		MemberVO member = new MemberVO();
-		req.setAttribute("member", member);
-		Map<String, String[]> paramMap = req.getParameterMap();
-		
-		try {
-			BeanUtils.populate(member, paramMap);
-		} catch (IllegalAccessException | InvocationTargetException e) {
-			e.printStackTrace();
-		}
-		
+	@URIMapping(value = "/MemberDelete.do", method = HttpMethod.POST)
+	public String doPost(@ModelData(name = "member") MemberVO member, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		Map<String, StringBuffer> errors = new LinkedHashMap<String, StringBuffer>();
 		req.setAttribute("errors", errors);
 		
 		boolean valid = true;
 		
 		String goPage = null;
-		boolean redirect = false; 
 		String message = null;
 		
 		if (valid) {
 			ServiceResult result = service.removeMember(member);
 			switch (result) {
 			case INVALIDPASSWORD:
-				goPage = "/WEB-INF/view/member/deleteForm.jsp";
+				goPage = "member/deleteForm";
 				message = "비밀번호 오류입니다.";
 				break;
 			case FAILED:
-				goPage = "/WEB-INF/view/member/deleteForm.jsp";
-				message = "서버 문제로 수정이 완료되지 않았습니다. 잠시 후 다시 시도해주세요.";
+				goPage = "member/deleteForm";
+				message = "서버 문제로 삭제가 완료되지 않았습니다. 잠시 후 다시 시도해주세요.";
 				break;
 			default:
-				goPage = "/login/loginForm.jsp";
+				goPage = "redirect:/login/loginForm.jsp";
 				req.getSession().removeAttribute("authMember");
-				redirect = true;
 				break;
 			}
 		} else {
-			goPage = "/WEB-INF/views/member/deleteForm.jsp";
+			goPage = "member/deleteForm";
 		}
 		
 		req.setAttribute("message", message);
 		
-		if (redirect) {
-			resp.sendRedirect(req.getContextPath() + goPage);
-		} else {
-			req.getRequestDispatcher(goPage).forward(req, resp);
-		}
+		return goPage;
 	}
 }

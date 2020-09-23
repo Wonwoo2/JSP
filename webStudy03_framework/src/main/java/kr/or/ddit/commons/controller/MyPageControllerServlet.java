@@ -3,40 +3,28 @@ package kr.or.ddit.commons.controller;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import kr.or.ddit.mvc.annotation.CommandHandler;
+import kr.or.ddit.mvc.annotation.HttpMethod;
+import kr.or.ddit.mvc.annotation.URIMapping;
 import kr.or.ddit.vo.MemberVO;
 
-@WebServlet("/mypage.do")
-public class MyPageControllerServlet extends HttpServlet {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+@CommandHandler
+public class MyPageControllerServlet {
 	
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		HttpSession session = req.getSession();
-		
+	@URIMapping(value = "/mypage.do", method = HttpMethod.GET)
+	public String doGet(HttpServletRequest req, HttpServletResponse resp, HttpSession session) throws ServletException, IOException {
 		MemberVO member = (MemberVO) session.getAttribute("member");
 		String goPage = null;
-		boolean redirect = false;
 		if (member == null) {
-			goPage = "/login/loginForm.jsp";
-			redirect = true;
+			goPage = "redirect:/login/loginForm.jsp";
 		} else {
 			req.setAttribute("member", member);
-			goPage = "/WEB-INF/views/member/mypage.jsp";
+			goPage = "member/mypage";
 		}
-		
-		if (redirect) {
-			resp.sendRedirect(req.getContextPath() + goPage);
-		} else {
-			req.getRequestDispatcher(goPage).forward(req, resp);
-		}
+		return goPage;
 	}
 }

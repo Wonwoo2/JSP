@@ -5,6 +5,7 @@ import java.util.List;
 import kr.or.ddit.enumpkg.ServiceResult;
 import kr.or.ddit.exception.CustomException;
 import kr.or.ddit.vo.MemberVO;
+import kr.or.ddit.vo.PagingVO;
 
 /**
  *  회원관리 Business Logic Layer
@@ -18,11 +19,13 @@ public interface IMemberService {
 	 */
 	public ServiceResult registMember(MemberVO member);
 	
+	public int retrieveMemberCount(PagingVO<MemberVO> pagingVo);
+	
 	/**
 	 * 회원 목록 조회(관리자용)
 	 * @return
 	 */
-	public List<MemberVO> retrieveMemberList();
+	public List<MemberVO> retrieveMemberList(PagingVO<MemberVO> pagingVo);
 	
 	/**
 	 * 회원 상세 조회(관리자용)

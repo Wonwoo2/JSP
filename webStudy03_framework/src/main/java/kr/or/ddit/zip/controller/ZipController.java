@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import kr.or.ddit.vo.PagingVO;
+import kr.or.ddit.vo.SearchVO;
 import kr.or.ddit.vo.ZipVO;
 import kr.or.ddit.zip.dao.IZipDAO;
 import kr.or.ddit.zip.dao.ZipDAOImpl;
@@ -34,8 +35,13 @@ public class ZipController extends HttpServlet {
 		req.setCharacterEncoding("UTF-8");
 		
 		String pageParam = req.getParameter("page");
+		String searchWord = req.getParameter("searchWord");
+		String searchType = req.getParameter("searchType");
 		PagingVO<ZipVO> pagingVo = new PagingVO<ZipVO>();
-		pagingVo.setSearchWord(req.getParameter("searchWord"));
+		SearchVO searchVo = new SearchVO();
+		searchVo.setSearchType(searchType);
+		searchVo.setSearchWord(searchWord);
+		pagingVo.setSearchVo(searchVo);
 		int totalRecord = dao.selectTotalCount(pagingVo);
 		pagingVo.setTotalRecord(totalRecord);
 		int currentPage = 1;

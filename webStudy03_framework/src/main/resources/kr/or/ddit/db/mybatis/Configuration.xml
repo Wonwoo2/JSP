@@ -21,5 +21,14 @@
 	<mappers>
 		<mapper resource="kr/or/ddit/db/mybatis/mappers/Zip.xml" />
 		<mapper resource="kr/or/ddit/db/mybatis/mappers/Member.xml" />
+		<mapper resource="kr/or/ddit/db/mybatis/mappers/Prod.xml" />
+		<mapper resource="kr/or/ddit/db/mybatis/mappers/Buyer.xml" />
+		<mapper resource="kr/or/ddit/db/mybatis/mappers/Other.xml" />
+		
+		
+		
+		
+		
+		<mapper resource="kr/or/ddit/db/mybatis/mappers/DatabaseProperty.xml" />
 	</mappers>
 </configuration>

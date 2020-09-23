@@ -2,50 +2,103 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.or.ddit.member.dao.IMemberDAO">
 	<insert id="insertMember" parameterType="MemberVO">
-		INSERT INTO member(mem_id, mem_pass, mem_name, mem_regno1, mem_regno2, mem_bir, mem_zip, mem_add1, mem_add2, mem_hometel, mem_comtel, mem_hp, 
+		INSERT INTO
+		member(mem_id, mem_pass, mem_name, mem_regno1, mem_regno2, mem_bir,
+		mem_zip, mem_add1, mem_add2, mem_hometel, mem_comtel, mem_hp,
 		mem_job, mem_like, mem_memorial, mem_memorialday, mem_mileage, mem_delete)
-		VALUES(#{mem_id}, #{mem_pass}, #{mem_name}, #{mem_regno1}, #{mem_regno2}, TO_DATE(#{mem_bir, jdbcType=DATE}, 'YYYY-MM-DD'), #{mem_zip}, #{mem_add1}, 
-		#{mem_add2}, #{mem_hometel}, #{mem_comtel}, #{mem_hp, jdbcType=VARCHAR}, #{mem_job, jdbcType=VARCHAR}, #{mem_like, jdbcType=VARCHAR}, 
-		#{mem_memorial, jdbcType=VARCHAR}, TO_DATE(#{mem_memorialday, jdbcType=DATE}, 'YYYY-MM-DD'), 
-		#{mem_mileage, jdbcType=NUMERIC}, #{mem_delete, jdbcType=VARCHAR})
+		VALUES(#{mem_id}, #{mem_pass}, #{mem_name}, #{mem_regno1}, #{mem_regno2}, 
+			TO_DATE(#{mem_bir, jdbcType=DATE}, 'YYYY-MM-DD'), #{mem_zip}, #{mem_add1}, 
+			#{mem_add2}, #{mem_hometel}, #{mem_comtel}, #{mem_hp, jdbcType=VARCHAR},
+			#{mem_job, jdbcType=VARCHAR}, #{mem_like, jdbcType=VARCHAR}, #{mem_memorial, jdbcType=VARCHAR}, 
+			TO_DATE(#{mem_memorialday, jdbcType=DATE}, 'YYYY-MM-DD'), #{mem_mileage, jdbcType=NUMERIC}, 
+			#{mem_delete, jdbcType=VARCHAR})
 	</insert>
-	
-	<select id="selectMemberList" resultType="MemberVO">
-		SELECT mem_id, mem_pass, mem_name,
-		mem_regno1, mem_regno2, TO_CHAR(mem_bir, 'YYYY-MM-DD') AS mem_bir,
-		mem_zip, mem_add1, mem_add2, mem_hometel, mem_comtel, mem_hp, mem_job, mem_like, mem_memorial,
-		TO_CHAR(mem_memorialday, 'YYYY-MM-DD') AS mem_memorialday, mem_mileage, mem_delete
+
+	<sql id="searchFrag">
+		<where>
+			<if test="searchVo neq null and @org.apache.commons.lang3.StringUtils@isNotBlank(searchVo.searchWord)">
+				<if test="'name' eq searchVo.searchType">
+					mem_name LIKE '%' ||#{searchVo.searchWord}|| '%'
+				</if>
+				<if test="'address' eq searchVo.searchType">
+					mem_add1 LIKE '%' ||#{searchVo.searchWord}|| '%'
+				</if>
+				<if test="'all' eq searchVo.searchType">
+					INSTR(mem_name, #{searchVo.searchWord}) > 0
+					OR
+					INSTR(mem_add1, #{searchVo.searchWord}) > 0
+				</if>
+			</if>
+		</where>
+	</sql>
+
+	<select id="selectMemberCount" parameterType="PagingVO"
+		resultType="int">
+		SELECT COUNT(*)
 		FROM member
+		<include refid="searchFrag" />
 	</select>
-	
-	<select id="selectMember" parameterType="string" resultType="MemberVO">
-		SELECT mem_id, mem_pass, mem_name,
+
+	<select id="selectMemberList" parameterType="PagingVO"
+		resultType="MemberVO">
+		SELECT A.*
+		FROM
+		(SELECT ROWNUM rn, mem_id, mem_pass, mem_name,
 		mem_regno1, mem_regno2, TO_CHAR(mem_bir, 'YYYY-MM-DD') AS mem_bir,
-		mem_zip, mem_add1, mem_add2, mem_hometel, mem_comtel, mem_hp, mem_job, mem_like, mem_memorial,
-		TO_CHAR(mem_memorialday, 'YYYY-MM-DD') AS mem_memorialday, mem_mileage, mem_delete
-		FROM member 
-		WHERE mem_id = #{mem_id}
+		mem_zip, mem_add1, mem_add2, mem_hometel, mem_comtel, mem_hp, mem_job,
+		mem_like, mem_memorial, TO_CHAR(mem_memorialday, 'YYYY-MM-DD') AS mem_memorialday, 
+		mem_mileage, mem_delete
+		FROM member
+		<include refid="searchFrag" />
+		) A
+				<![CDATA[
+					WHERE rn >= #{startRow} AND rn <= #{endRow}
+				]]>
 	</select>
-	
+
+	<resultMap type="MemberVO" id="memberMap" autoMapping="true">
+		<id property="mem_id" column="mem_id" />
+		<collection property="prodList" ofType="ProdVO"
+			autoMapping="true">
+		</collection>
+	</resultMap>
+
+	<select id="selectMember" parameterType="string" resultMap="memberMap">
+		WITH memcart AS(
+		SELECT DISTINCT mem_id, mem_pass, mem_name, mem_regno1, mem_regno2, to_char(mem_bir,'yyyy-mm-dd') mem_bir,
+				mem_zip, mem_add1, mem_add2, mem_hometel, mem_comtel, mem_hp, mem_job, mem_like, mem_memorial, 
+				TO_CHAR(mem_memorialday, 'yyyy-mm-dd') mem_memorialday, mem_mileage, mem_delete, 
+				cart_member, cart_prod
+			FROM member LEFT OUTER JOIN CART 
+			ON (mem_id = cart_member)
+			WHERE mem_id = #{mem_id}
+		)
+		
+		SELECT memcart.*, prod_id, prod_name, prod_cost, prod_price, prod_mileage
+		FROM memcart LEFT OUTER JOIN prod 
+		ON(cart_prod = prod_id)
+	</select>
+
 	<update id="updateMember" parameterType="MemberVO">
 		UPDATE member
-				<set>
-      				<if test="mem_pass != null">mem_pass = #{mem_pass},</if>
-      				<if test="mem_name != null">mem_name = #{mem_name},</if>
-      				<if test="mem_zip != null">mem_zip = #{mem_zip},</if>
-      				<if test="mem_add1 != null">mem_add1 = #{mem_add1},</if>
-      				<if test="mem_hometel != null">mem_hometel = #{mem_hometel},</if>
-      				<if test="mem_comtel != null">mem_comtel = #{mem_comtel},</if>
-      				<if test="mem_job != null">mem_job = #{mem_job, jdbcType=VARCHAR},</if>
-      				<if test="mem_like != null">mem_like = #{mem_like, jdbcType=VARCHAR},</if>
-      				<if test="mem_memorial != null">mem_memorial = #{mem_memorial, jdbcType=VARCHAR},</if>
-      				<if test="mem_memorialday != null">mem_memorialday = TO_DATE(#{mem_memorialday, jdbcType=DATE}, 'YYYY-MM-DD')</if>
-    			</set>
+		<set>
+			<if test="mem_pass != null">mem_pass = #{mem_pass},</if>
+			<if test="mem_name != null">mem_name = #{mem_name},</if>
+			<if test="mem_zip != null">mem_zip = #{mem_zip},</if>
+			<if test="mem_add1 != null">mem_add1 = #{mem_add1},</if>
+			<if test="mem_hometel != null">mem_hometel = #{mem_hometel},</if>
+			<if test="mem_comtel != null">mem_comtel = #{mem_comtel},</if>
+			<if test="mem_job != null">mem_job = #{mem_job, jdbcType=VARCHAR},</if>
+			<if test="mem_like != null">mem_like = #{mem_like, jdbcType=VARCHAR},</if>
+			<if test="mem_memorial != null">mem_memorial = #{mem_memorial, jdbcType=VARCHAR},</if>
+			<if test="mem_memorialday != null">mem_memorialday = TO_DATE(#{mem_memorialday,	jdbcType=DATE}, 'YYYY-MM-DD')</if>
+		</set>
 		WHERE mem_id = #{mem_id}
 	</update>
-	
+
 	<delete id="deleteMember" parameterType="string">
-		UPDATE member SET mem_delete = 'Y'
+		UPDATE member SET
+		mem_delete = 'Y'
 		WHERE mem_id = #{mem_id}
 	</delete>
 </mapper>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.prod.dao.IProdDAO">
+	<insert id="insertProd" parameterType="ProdVO">
+		<selectKey resultType="string" order="BEFORE" keyProperty="prod_id">
+			SELECT #{prod_lgu, jdbcType=VARCHAR} || LPAD(NVL(TO_NUMBER(SUBSTR(MAX(prod_id), 5)), 0) + 1, 6, '0') AS prod_id
+			FROM prod
+			WHERE prod_lgu = #{prod_lgu, jdbcType=VARCHAR}
+		</selectKey>
+		INSERT INTO prod ( prod_id, prod_name, prod_lgu, prod_buyer, prod_cost, prod_price,
+						prod_sale, prod_outline, prod_detail, prod_img, prod_totalstock,
+						prod_insdate, prod_properstock, prod_size, prod_color, prod_delivery,
+						prod_unit, prod_qtyin, prod_qtysale, prod_mileage
+					) VALUES (
+						#{prod_id, jdbcType=VARCHAR}, #{prod_name, jdbcType=VARCHAR}, #{prod_lgu, jdbcType=VARCHAR}, 
+						#{prod_buyer, jdbcType=VARCHAR}, #{prod_cost, jdbcType=NUMERIC}, #{prod_price, jdbcType=NUMERIC},
+						#{prod_sale, jdbcType=NUMERIC}, #{prod_outline, jdbcType=VARCHAR}, #{prod_detail, jdbcType=VARCHAR}, 
+						#{prod_img, jdbcType=VARCHAR}, #{prod_totalstock, jdbcType=NUMERIC}, SYSDATE, 
+						#{prod_properstock, jdbcType=NUMERIC}, #{prod_size, jdbcType=VARCHAR}, #{prod_color, jdbcType=VARCHAR}, 
+						#{prod_delivery, jdbcType=VARCHAR}, #{prod_unit, jdbcType=VARCHAR}, #{prod_qtyin, jdbcType=NUMERIC}, 
+						#{prod_qtysale, jdbcType=NUMERIC}, #{prod_mileage, jdbcType=NUMERIC}
+					)
+	</insert>
+	
+	<resultMap type="ProdVO" id="ProdMap" autoMapping="true">
+		<id property="prod_id" column="prod_id" />
+		<association property="buyer" javaType="BuyerVO" autoMapping="true"></association>
+		<collection property="memberList" ofType="MemberVO" autoMapping="true">
+		</collection>
+	</resultMap>
+	
+	<select id="selectProd" parameterType="string" resultMap="ProdMap">
+		WITH cartview AS (
+			SELECT DISTINCT cart_member, cart_prod, mem_id, mem_name, mem_hp, mem_add1
+			FROM cart INNER JOIN member ON(cart_member = mem_id)
+		), prodview AS (
+			SELECT prod_id, prod_name, prod_lgu, prod_buyer, prod_cost, prod_price, prod_sale, prod_outline,
+			prod_detail, prod_img, prod_totalstock, TO_CHAR(prod_insdate, 'YYYY-MM-DD'), prod_properstock, 
+			prod_size, prod_color, prod_delivery, prod_unit, prod_qtyin, prod_qtysale, prod_mileage, lprod_nm,
+			buyer_id, buyer_name, buyer_charger, buyer_add1
+			FROM prod INNER JOIN lprod ON(prod_lgu = lprod_gu)
+			INNER JOIN buyer ON(prod_buyer = buyer_id)
+		)
+		SELECT prodview.*, mem_id, mem_name, mem_hp, mem_add1
+		FROM prodview LEFT OUTER JOIN cartview ON (prod_id = cart_prod)
+		WHERE prod_id = #{prod_id}
+	</select>
+	
+	<sql id="searchFrag">
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="searchDetail neq null">
+				<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(searchDetail.prod_name)">
+					AND INSTR(prod_name, #{searchDetail.prod_name}) > 0
+				</if>
+				<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(searchDetail.prod_lgu)">
+					AND prod_lgu = #{searchDetail.prod_lgu}
+				</if>
+				<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(searchDetail.prod_buyer)">
+					AND prod_buyer = #{searchDetail.prod_buyer}
+				</if>
+			</if>
+		</trim>
+	</sql>
+	
+	<select id="selectProdCount" parameterType="PagingVO" resultType="int">
+		SELECT COUNT(*)
+		FROM prod
+		<include refid="searchFrag" />
+	</select>
+	
+	<select id="selectProdList" parameterType="PagingVO" resultMap="ProdMap">
+		SELECT A.*, BUYER_NAME "buyer.buyer_name"
+		FROM (
+			SELECT ROWNUM rn, prod_id, prod_name, prod_lgu, prod_buyer, 
+			prod_cost, prod_price, prod_sale, lprod_nm, buyer_name 
+			FROM prod INNER JOIN lprod ON (prod_lgu = lprod_gu)
+						INNER JOIN buyer ON (prod_buyer = buyer_id)
+			<include refid="searchFrag" />
+		) A	
+		WHERE rn BETWEEN #{startRow} AND #{endRow}
+		
+	</select>
+</mapper>

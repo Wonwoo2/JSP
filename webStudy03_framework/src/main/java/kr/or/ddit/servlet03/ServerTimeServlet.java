@@ -7,18 +7,19 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import kr.or.ddit.mvc.annotation.CommandHandler;
+import kr.or.ddit.mvc.annotation.HttpMethod;
+import kr.or.ddit.mvc.annotation.URIMapping;
 import kr.or.ddit.servlet01.CalculateServlet.MarshallingType;
 
-@WebServlet("/getServerTime.do")
-public class ServerTimeServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+@CommandHandler
+public class ServerTimeServlet {
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	@URIMapping(value = "/getServerTime.do", method = HttpMethod.GET)
+	public String doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		Calendar cal = Calendar.getInstance();
 		Map<String, Object> targetMap = new LinkedHashMap<>();
 		targetMap.put("now", String.format("%tc", cal));
@@ -29,5 +30,6 @@ public class ServerTimeServlet extends HttpServlet {
 		){
 			out.println(jsonText);
 		}
+		return null;
 	}
 }

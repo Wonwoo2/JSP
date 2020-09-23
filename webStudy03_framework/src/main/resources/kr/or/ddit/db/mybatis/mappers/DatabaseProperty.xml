@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.prop.dao.IDataBasePropertyDAO">
+	<select id="selectDataBaseProperties" parameterType="DataBasePropertyVO" resultType="DataBasePropertyVO">
+		SELECT property_name, property_value, description 
+		FROM database_properties
+		<where>
+			<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(property_name)">
+				INSTR(mem_name, #{property_name}) > 0
+			</if>
+			<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(property_value)">
+				INSTR(mem_name, #{property_value}) > 0
+			</if>
+			<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(description)">
+				INSTR(mem_name, #{description}) > 0
+			</if>
+		</where>
+	</select>
+	<select id="selectAllProperty_names" resultType="string">
+		SELECT property_name 
+		FROM database_properties
+	</select>
+</mapper>

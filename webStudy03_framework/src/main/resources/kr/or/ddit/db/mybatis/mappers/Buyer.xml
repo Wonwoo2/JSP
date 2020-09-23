@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.buyer.dao.IBuyerDAO">
+	<resultMap type="BuyerVO" id="BuyerMap" autoMapping="true">
+		<id property="buyer_id" column="buyer_id" />
+		<collection property="prodList" ofType="ProdVO" autoMapping="true"></collection>
+	</resultMap>
+	<select id="selectBuyer" parameterType="string" resultMap="BuyerMap">
+	
+		WITH buyerview AS(
+			SELECT buyer_id,    buyer_name,    buyer_lgu,    buyer_bank, buyer_bankno, buyer_bankname, 
+			buyer_zip, buyer_add1, buyer_add2, buyer_comtel, buyer_fax, buyer_mail, buyer_charger, buyer_telext, 
+			lprod_nm
+			FROM buyer INNER JOIN lprod ON(buyer_lgu = lprod_gu)
+			WHERE buyer_id = #{buyer_id}
+		)
+		SELECT buyerview.*,
+                prod_id, prod_name, prod_lgu, prod_buyer, prod_cost, prod_price, prod_sale, 
+                prod_outline, prod_detail, prod_size
+		FROM buyerview LEFT JOIN prod ON(buyer_id = prod_buyer)
+	</select>
+</mapper>

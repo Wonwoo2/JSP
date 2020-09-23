@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>member/MemberDelete.jsp</title>
+<title>member/deleteForm.jsp</title>
 </head>
 <jsp:include page="/includee/preScript.jsp" />
 <body>

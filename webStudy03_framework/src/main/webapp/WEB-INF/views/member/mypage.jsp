@@ -99,8 +99,8 @@ td {
 			</tr>
 			<tr>
 				<td colspan="2">
-					<input type="button" value="수정하기" onclick="location.href='<%= request.getContextPath() %>/MemberUpdate.do'"/>
-					<input type="button" value="탈퇴하기" onclick="location.href='<%= request.getContextPath() %>/MemberDelete.do'"/>
+					<input type="button" value="수정하기" data-command="update" onclick="location.href='<%= request.getContextPath() %>/MemberUpdate.do';"/>
+					<input type="button" value="탈퇴하기" data-command="delete" onclick="location.href='<%= request.getContextPath() %>/MemberDelete.do';"/>
 				</td>
 			</tr>
 		</tbody>
