@@ -5,13 +5,13 @@
 		INSERT INTO
 		member(mem_id, mem_pass, mem_name, mem_regno1, mem_regno2, mem_bir,
 		mem_zip, mem_add1, mem_add2, mem_hometel, mem_comtel, mem_hp,
-		mem_job, mem_like, mem_memorial, mem_memorialday, mem_mileage, mem_delete)
+		mem_job, mem_like, mem_memorial, mem_memorialday, mem_mileage, mem_delete, mem_role)
 		VALUES(#{mem_id}, #{mem_pass}, #{mem_name}, #{mem_regno1}, #{mem_regno2}, 
 			TO_DATE(#{mem_bir, jdbcType=DATE}, 'YYYY-MM-DD'), #{mem_zip}, #{mem_add1}, 
 			#{mem_add2}, #{mem_hometel}, #{mem_comtel}, #{mem_hp, jdbcType=VARCHAR},
 			#{mem_job, jdbcType=VARCHAR}, #{mem_like, jdbcType=VARCHAR}, #{mem_memorial, jdbcType=VARCHAR}, 
 			TO_DATE(#{mem_memorialday, jdbcType=DATE}, 'YYYY-MM-DD'), #{mem_mileage, jdbcType=NUMERIC}, 
-			#{mem_delete, jdbcType=VARCHAR})
+			#{mem_delete, jdbcType=VARCHAR}, 'ROLE_USER')
 	</insert>
 
 	<sql id="searchFrag">
@@ -47,7 +47,7 @@
 		mem_regno1, mem_regno2, TO_CHAR(mem_bir, 'YYYY-MM-DD') AS mem_bir,
 		mem_zip, mem_add1, mem_add2, mem_hometel, mem_comtel, mem_hp, mem_job,
 		mem_like, mem_memorial, TO_CHAR(mem_memorialday, 'YYYY-MM-DD') AS mem_memorialday, 
-		mem_mileage, mem_delete
+		mem_mileage, mem_delete, mem_role
 		FROM member
 		<include refid="searchFrag" />
 		) A
@@ -67,7 +67,7 @@
 		WITH memcart AS(
 		SELECT DISTINCT mem_id, mem_pass, mem_name, mem_regno1, mem_regno2, to_char(mem_bir,'yyyy-mm-dd') mem_bir,
 				mem_zip, mem_add1, mem_add2, mem_hometel, mem_comtel, mem_hp, mem_job, mem_like, mem_memorial, 
-				TO_CHAR(mem_memorialday, 'yyyy-mm-dd') mem_memorialday, mem_mileage, mem_delete, 
+				TO_CHAR(mem_memorialday, 'yyyy-mm-dd') mem_memorialday, mem_mileage, mem_delete, mem_role,
 				cart_member, cart_prod
 			FROM member LEFT OUTER JOIN CART 
 			ON (mem_id = cart_member)

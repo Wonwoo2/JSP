@@ -55,4 +55,16 @@ public class ProdServiceImpl implements IProdService {
 	public List<ProdVO> retrieveProdList(PagingVO<ProdVO> pagingVo) {
 		return dao.selectProdList(pagingVo);
 	}
+
+	@Override
+	public ServiceResult modifyProd(ProdVO prod) {
+		ServiceResult result = null;
+		int updateResult = dao.updateProd(prod);
+		if (updateResult > 0) {
+			result = ServiceResult.OK;
+		} else {
+			result = ServiceResult.FAILED;
+		}
+		return result;
+	}
 }

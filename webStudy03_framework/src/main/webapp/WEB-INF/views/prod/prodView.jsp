@@ -156,6 +156,7 @@
 			<td>
 				<!-- /prod/prodList.do 요청 발생(동기, 비동기 모두 처리 -->
 				<input type="button" value="목록으로" onclick="location.href='<%= request.getContextPath() %>/prod/prodList.do';" />
+				<input type="button" value="수정하기" onclick="location.href='<%= request.getContextPath()%>/prod/prodUpdate.do?what=<%= prod.getProd_id() %>';" />
 			</td>
 		</tr>
 	</table>

@@ -7,19 +7,11 @@
 	<input type="hidden" name="service" />
 </form>
 <ul>
-	<%
-		TopMenuType[] types = TopMenuType.values();
-		for (TopMenuType tmp : types) {
-			MenuVO menuVo = tmp.getMenuVo();
-	%>
-	<li>
-		<a class="topMenu" data-service="<%= menuVo.getMenuId() %>" data-action="<%= menuVo.getMenuURI() %>">
-			<%= menuVo.getMenuText() %>
-		</a>
-	</li>
-	<%
-			}
-	%>
+	<li><a href="<%= request.getContextPath() %>/member/memberList.do">회원관리</a></li>
+	<li><a href="<%= request.getContextPath() %>/prod/prodList.do">상품관리</a></li>
+	<li><a href="#">거래처관리</a></li>
+	<li><a href="#">게시판</a></li>
+	<li><a href="#">방명록</a></li>
 </ul>
 <script type="text/javascript">
 	var menuForm = $("#menuForm");

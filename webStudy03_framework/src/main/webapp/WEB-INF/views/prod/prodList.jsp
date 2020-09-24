@@ -9,18 +9,16 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title></title>
 <jsp:include page="/includee/preScript.jsp" />
 </head>
 <body>
 	<%
 		PagingVO<ProdVO> pagingVo = (PagingVO) request.getAttribute("pagingVo");
 	%>
-	<form id="searchForm"
-		action="<%=request.getContextPath()%>/prod/prodList.do"
-		class="form-inline">
-		<input type="hidden" name="page" /> <select class="form-control"
-			name="prod_lgu">
+	<form id="searchForm" action="<%=request.getContextPath()%>/prod/prodList.do" class="form-inline">
+		<input type="hidden" name="page" /> 
+		<select class="form-control" name="prod_lgu">
 			<option value>상품분류</option>
 			<%
 				List<Map<String, Object>> lprodList = (List) request.getAttribute("lprodList");
@@ -30,7 +28,8 @@
 			<%
 				}
 			%>
-		</select> <select class="form-control" name="prod_buyer">
+		</select> 
+		<select class="form-control" name="prod_buyer">
 			<option value>거래처</option>
 			<%
 				List<BuyerVO> buyerList = (List) request.getAttribute("buyerList");
@@ -40,9 +39,42 @@
 			<%
 				}
 			%>
-		</select> <input type="text" name="prod_name" /> <input type="submit"
-			class="btn btn-primary" value="검색" />
+		</select>
+		<input type="text" name="prod_name" />
+		<input type="hidden" name="buyer_lgu" />
+		<input type="submit" class="btn btn-primary" value="검색" />
 	</form>
+	<script type="text/javascript">
+		let buyerSelect = $("[name='prod_buyer']");
+		$("[name='prod_lgu']").on("change", function() {
+			let buyer_lgu = $(this).val();
+			$("[name='buyer_lgu']").val(buyer_lgu);
+			
+			$.ajax({
+				url : "<%= request.getContextPath()%>/prod/buyerList.do",
+				data : {
+					buyer_lgu : buyer_lgu
+				},
+				method : "get",
+				dataType : "json",
+				success : function(resp) {
+					buyerSelect.empty();
+					buyerSelect.append($("<option>").text("상품분류"));
+					
+					let buyerList = resp.buyerList;
+					$(buyerList).each(function(idx, buyer) {
+						let buyerItem = $("<option>");
+						buyerItem.text(buyer.buyer_name);
+						buyerItem.val(buyer.buyer_id);
+						buyerSelect.append(buyerItem);
+					});
+				},
+				error : function(errorResp) {
+					console.log(errorResp);
+				}
+			})
+		});
+	</script>
 	<table id="prodTable" class="table table-bordered">
 		<thead>
 			<tr>
@@ -61,7 +93,7 @@
 					for (ProdVO prod : prodList) {
 			%>
 			<tr>
-				<td><%=prod.getProd_name()%></td>
+				<td><a href="<%= request.getContextPath() %>/prod/prodView.do?what=<%= prod.getProd_id() %>"><%=prod.getProd_name()%></a></td>
 				<td><%=prod.getLprod_nm()%></td>
 				<td><%=prod.getBuyer().getBuyer_name()%></td>
 				<td><%=prod.getProd_cost()%></td>
@@ -162,27 +194,27 @@
 		});
 		return false;
 	});
-	$("#prodTable>tbody").on("click","a", function(){
-		let what = $(this).data("what"); 
-<%-- 		location.href="<%=request.getContextPath() %>/Prod/ProdView.do?what="+what; --%>
-		$.ajax({
-			url : "<%=request.getContextPath()%>/prod/prodView.do",
-			method : "get",
-			data : {
-				what:what
-			},
-			dataType : "html",
-			success : function(resp) {
-				$("#prodViewModal").find("#whatArea").text(what);
-				$("#prodViewModal").find(".modal-body").html(resp);
-				$("#prodViewModal").modal("show");
-			},
-			error : function(errResp) {
-				console.log(errResp);
-			}
-		});
-		return false;
-	});
+// 	$("#prodTable>tbody").on("click","a", function(){
+// 		let what = $(this).data("what"); 
+<%-- <%-- 		location.href="<%=request.getContextPath() %>/Prod/ProdView.do?what="+what; --%>
+// 		$.ajax({
+<%-- 			url : "<%=request.getContextPath()%>/prod/prodView.do", --%>
+// 			method : "get",
+// 			data : {
+// 				what:what
+// 			},
+// 			dataType : "html",
+// 			success : function(resp) {
+// 				$("#prodViewModal").find("#whatArea").text(what);
+// 				$("#prodViewModal").find(".modal-body").html(resp);
+// 				$("#prodViewModal").modal("show");
+// 			},
+// 			error : function(errResp) {
+// 				console.log(errResp);
+// 			}
+// 		});
+// 		return false;
+// 	});
 </script>
 </body>
 </html>

@@ -64,4 +64,14 @@ public class ProdDAOImpl implements IProdDAO {
 			return mapper.selectProdList(pagingVo);
 		}
 	}
+
+	@Override
+	public int updateProd(ProdVO prod) {
+		try (
+				SqlSession session = sqlSessionFactory.openSession(true);
+		) {
+			IProdDAO mapper = session.getMapper(IProdDAO.class);
+			return mapper.updateProd(prod);
+		}
+	}
 }

@@ -2,6 +2,7 @@ package kr.or.ddit.prod.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,10 +32,6 @@ public class ProdRetrieveController {
 	
 	private IProdService service = ProdServiceImpl.getInstance();
 	private IOtherDAO dao = OtherDAOImpl.getInstance();
-	
-	private List<BuyerVO> buyerList = dao.selectBuyerList();
-	private List<Map<String, Object>> lprodList = dao.selectLprodGuList();
-	
 
 	@URIMapping(value = "/prod/prodView.do", method = HttpMethod.GET)
 	public String prodView(@RequestParameter(name = "what") String what, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -75,8 +72,27 @@ public class ProdRetrieveController {
 		}
 	}
 	
+	@URIMapping(value = "/prod/buyerList.do")
+	public String changeBuyer(@RequestParameter(name = "buyer_lgu") String buyer_lgu,
+			HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		
+		List<BuyerVO> buyerList = dao.selectBuyerList(buyer_lgu);
+		
+		Map<String, List<BuyerVO>> paramMap = new LinkedHashMap<>();
+		paramMap.put("buyerList", buyerList);
+		String accept = req.getHeader("Accept");
+		if (StringUtils.containsIgnoreCase(accept, "json")) {
+			resp.setContentType("application/json;charset=UTF-8");
+			ObjectMapper mapper = new ObjectMapper();
+			try (PrintWriter out = resp.getWriter();) {
+				mapper.writeValue(out, paramMap);
+			}
+		}
+		return null;
+	}
+	
 	public void addAttribue(HttpServletRequest request) {
-		request.setAttribute("lprodList", lprodList);
-		request.setAttribute("buyerList", buyerList);
+		request.setAttribute("lprodList", dao.selectLprodGuList());
+		request.setAttribute("buyerList", dao.selectBuyerList(null));
 	}
 }

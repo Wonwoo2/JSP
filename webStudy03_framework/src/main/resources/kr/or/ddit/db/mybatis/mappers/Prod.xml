@@ -68,7 +68,7 @@
 		<include refid="searchFrag" />
 	</select>
 	
-	<select id="selectProdList" parameterType="PagingVO" resultMap="ProdMap">
+	<select id="selectProdList" parameterType="PagingVO" resultType="ProdVO">
 		SELECT A.*, BUYER_NAME "buyer.buyer_name"
 		FROM (
 			SELECT ROWNUM rn, prod_id, prod_name, prod_lgu, prod_buyer, 
@@ -78,6 +78,25 @@
 			<include refid="searchFrag" />
 		) A	
 		WHERE rn BETWEEN #{startRow} AND #{endRow}
-		
 	</select>
-</mapper>
+	
+	<update id="updateProd" parameterType="ProdVO">
+		UPDATE prod SET prod_name = #{prod_name, jdbcType=VARCHAR},
+						prod_cost = #{prod_cost, jdbcType=NUMERIC},
+						prod_price = #{prod_price, jdbcType=NUMERIC},
+						prod_sale = #{prod_sale, jdbcType=NUMERIC},
+						prod_outline = #{prod_outline, jdbcType=VARCHAR},
+						prod_detail = #{prod_detail, jdbcType=VARCHAR},
+						prod_img = #{prod_img, jdbcType=VARCHAR},
+						prod_totalstock = #{prod_totalstock, jdbcType=NUMERIC},
+						prod_properstock = #{prod_properstock, jdbcType=NUMERIC},
+						prod_size = #{prod_size, jdbcType=VARCHAR},
+						prod_color = #{prod_color, jdbcType=VARCHAR},
+						prod_delivery = #{prod_delivery, jdbcType=VARCHAR},
+						prod_unit = #{prod_unit, jdbcType=VARCHAR},
+						prod_qtyin = #{prod_qtyin, jdbcType=NUMERIC},
+						prod_qtysale = #{prod_qtysale, jdbcType=NUMERIC},
+						prod_mileage = #{prod_mileage, jdbcType=NUMERIC}
+		WHERE prod_id = #{prod_id, jdbcType=VARCHAR}
+	</update>
+</mapper> 

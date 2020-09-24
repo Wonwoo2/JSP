@@ -19,12 +19,8 @@ public class MyPageControllerServlet {
 	public String doGet(HttpServletRequest req, HttpServletResponse resp, HttpSession session) throws ServletException, IOException {
 		MemberVO member = (MemberVO) session.getAttribute("member");
 		String goPage = null;
-		if (member == null) {
-			goPage = "redirect:/login/loginForm.jsp";
-		} else {
-			req.setAttribute("member", member);
-			goPage = "member/mypage";
-		}
+		req.setAttribute("member", member);
+		goPage = "member/mypage";
 		return goPage;
 	}
 }

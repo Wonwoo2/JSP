@@ -9,5 +9,5 @@ public interface IOtherDAO {
 	
 	public List<Map<String, Object>> selectLprodGuList();
 	
-	public List<BuyerVO> selectBuyerList();
+	public List<BuyerVO> selectBuyerList(String buyer_lgu);
 }

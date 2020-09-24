@@ -1,3 +1,5 @@
+<%@page import="kr.or.ddit.vo.ProdVO"%>
+<%@page import="org.apache.commons.lang3.StringUtils"%>
 <%@page import="java.util.Map.Entry"%>
 <%@page import="kr.or.ddit.vo.BuyerVO"%>
 <%@page import="java.util.Set"%>
@@ -9,9 +11,28 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>prod/prodForm.jsp</title>
 <jsp:include page="/includee/preScript.jsp" />
 </head>
+<%
+	String command = (String) request.getAttribute("command");
+	ProdVO prod = (ProdVO) request.getAttribute("prod");
+
+	if (StringUtils.isNotBlank(command) && "update".equals(command)) {
+%>
+<script type="text/javascript">
+	$(function() {
+		let lguItem = $("[name='prod_lgu']");
+		let buyerItem = $("[name='prod_buyer']")
+		
+		lguItem.find("option[value!=<%= prod.getProd_lgu() %>]").remove();
+		buyerItem.find("option[value!=<%= prod.getProd_buyer() %>]").remove();
+	});
+</script>		
+<%
+	}
+%>
+
 <body>
 <jsp:useBean id="errors" class="java.util.LinkedHashMap" scope="request"/>
 	<form method="post">
@@ -138,7 +159,7 @@
 				<th>상품이미지경로</th>
 				<td>
 					<div class="form-group form-inline">
-						<input class="form-control mr-2" type="text" required name="prod_img"
+						<input class="form-control mr-2" type="file" required name="prod_image"
 							value="${prod.prod_img }" maxLength="40" />
 						<span class="error"><%=errors.get("prod_img") %></span>
 					</div>

@@ -21,4 +21,6 @@ public interface IProdDAO {
 	 * @return
 	 */
 	public List<ProdVO> selectProdList(PagingVO<ProdVO> pagingVo);
+	
+	public int updateProd(ProdVO prod);
 }
