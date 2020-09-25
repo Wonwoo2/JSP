@@ -9,10 +9,13 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import kr.or.ddit.enumpkg.ServiceResult;
 import kr.or.ddit.exception.CustomException;
+import kr.or.ddit.filter.wrapper.FileUploadRequestWrapper;
+import kr.or.ddit.filter.wrapper.PartWrapper;
 import kr.or.ddit.member.service.IMemberService;
 import kr.or.ddit.member.service.MemberServiceImpl;
 import kr.or.ddit.mvc.annotation.CommandHandler;
@@ -30,13 +33,19 @@ public class MemberRegistController {
 	private IMemberService service = MemberServiceImpl.getInstance();
 
 	@URIMapping(value = "/registMember.do", method = HttpMethod.GET)
-	public String doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	public String doGet(HttpServletRequest req) throws ServletException, IOException {
 		String goPage = "member/registForm";
 		return goPage;
 	}
 
 	@URIMapping(value = "/registMember.do", method = HttpMethod.POST)
-	public String doPost(@ModelData(name = "member") MemberVO member, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	public String doPost(@ModelData(name = "registMember") MemberVO member, HttpServletRequest req) throws ServletException, IOException {
+		if (req instanceof FileUploadRequestWrapper) {
+			PartWrapper partWrapper = ((FileUploadRequestWrapper) req).getPartWrapper("mem_image");
+			if (partWrapper != null) {
+				member.setMem_image(partWrapper);
+			}
+		}
 		
 		// 2. 검증(DB 스키마 구조 참고)
 		Map<String, StringBuffer> errors = new LinkedHashMap<>();

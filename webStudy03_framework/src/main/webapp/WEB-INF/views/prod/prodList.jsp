@@ -1,8 +1,9 @@
-<%@page import="kr.or.ddit.vo.BuyerVO"%>
-<%@page import="java.util.Map"%>
-<%@page import="java.util.List"%>
-<%@page import="kr.or.ddit.vo.PagingVO"%>
-<%@page import="kr.or.ddit.vo.ProdVO"%>
+<%-- <%@page import="kr.or.ddit.vo.BuyerVO"%> --%>
+<%-- <%@page import="java.util.Map"%> --%>
+<%-- <%@page import="java.util.List"%> --%>
+<%-- <%@page import="kr.or.ddit.vo.PagingVO"%> --%>
+<%-- <%@page import="kr.or.ddit.vo.ProdVO"%> --%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -13,32 +14,22 @@
 <jsp:include page="/includee/preScript.jsp" />
 </head>
 <body>
-	<%
+	<%--
 		PagingVO<ProdVO> pagingVo = (PagingVO) request.getAttribute("pagingVo");
-	%>
-	<form id="searchForm" action="<%=request.getContextPath()%>/prod/prodList.do" class="form-inline">
+	--%>
+	<form id="searchForm" action="${pageContext.request.contextPath}/prod/prodList.do" class="form-inline">
 		<input type="hidden" name="page" /> 
 		<select class="form-control" name="prod_lgu">
 			<option value>상품분류</option>
-			<%
-				List<Map<String, Object>> lprodList = (List) request.getAttribute("lprodList");
-				for (Map<String, Object> lprod : lprodList) {
-			%>
-			<option value="<%=lprod.get("lprod_gu")%>"><%=lprod.get("lprod_nm")%></option>
-			<%
-				}
-			%>
+			<c:forEach items="${lprodList}" var="lprod">
+				<option value="${lprod.lprod_gu}">${lprod["lprod_nm"]}</option>
+			</c:forEach>
 		</select> 
 		<select class="form-control" name="prod_buyer">
 			<option value>거래처</option>
-			<%
-				List<BuyerVO> buyerList = (List) request.getAttribute("buyerList");
-				for (BuyerVO buyer : buyerList) {
-			%>
-			<option value="<%=buyer.getBuyer_id()%>"><%=buyer.getBuyer_name()%></option>
-			<%
-				}
-			%>
+			<c:forEach items="${buyerList}" var="buyer">
+				<option value="${buyer.buyer_id}">${buyer.buyer_name}</option>
+			</c:forEach>
 		</select>
 		<input type="text" name="prod_name" />
 		<input type="hidden" name="buyer_lgu" />
@@ -51,7 +42,7 @@
 			$("[name='buyer_lgu']").val(buyer_lgu);
 			
 			$.ajax({
-				url : "<%= request.getContextPath()%>/prod/buyerList.do",
+				url : "${pageContext.request.contextPath}/prod/buyerList.do",
 				data : {
 					buyer_lgu : buyer_lgu
 				},
@@ -87,33 +78,35 @@
 			</tr>
 		</thead>
 		<tbody>
-			<%
-				List<ProdVO> prodList = pagingVo.getData();
-				if (prodList != null && prodList.size() > 0) {
-					for (ProdVO prod : prodList) {
-			%>
-			<tr>
-				<td><a href="<%= request.getContextPath() %>/prod/prodView.do?what=<%= prod.getProd_id() %>"><%=prod.getProd_name()%></a></td>
-				<td><%=prod.getLprod_nm()%></td>
-				<td><%=prod.getBuyer().getBuyer_name()%></td>
-				<td><%=prod.getProd_cost()%></td>
-				<td><%=prod.getProd_price()%></td>
-				<td><%=prod.getProd_sale()%></td>
-			</tr>
-			<%
-				}
-				} else {
-			%>
-			<tr>
-				<td colspan="6">검색 조건에 맞는 상품 없음.</td>
-			</tr>
-			<%
-				}
-			%>
+			<c:set var="prodList" value="${pagingVo.data}">
+			</c:set>
+			<c:choose>
+				<c:when test="${not empty prodList}">
+					<c:forEach items="${prodList}" var="prod">
+						<tr>
+							<c:url value="/prod/prodView.do" var="prodViewURL">
+								<c:param name="what" value="${prod.prod_id}" />
+							</c:url>
+							<td><a href="${prodViewURL}">${prod.prod_name}</a></td>
+							<td>${prod.lprod_nm}</td>
+							<td>${prod.buyer.buyer_name}</td>
+							<td>${prod.prod_cost}</td>
+							<td>${prod.prod_price}</td>
+							<td>${prod.prod_sale}</td>
+						</tr>
+					</c:forEach>
+				</c:when>
+				<c:otherwise>
+					<tr>
+						<td colspan="6">검색 조건에 맞는 상품 없음.</td>
+					</tr>
+				</c:otherwise>
+			</c:choose>
 		</tbody>
 		<tfoot>
 			<tr>
-				<td colspan="6" id="pagingArea"><%= pagingVo.getPagingHTML_BS() %>
+				<td colspan="6" id="pagingArea">
+					${pagingVo.pagingHTML_BS}
 				</td>
 			</tr>
 		</tfoot>
@@ -196,9 +189,9 @@
 	});
 // 	$("#prodTable>tbody").on("click","a", function(){
 // 		let what = $(this).data("what"); 
-<%-- <%-- 		location.href="<%=request.getContextPath() %>/Prod/ProdView.do?what="+what; --%>
+<%-- <%-- 		location.href="${pageContext.request.contextPath}/Prod/ProdView.do?what="+what; --%>
 // 		$.ajax({
-<%-- 			url : "<%=request.getContextPath()%>/prod/prodView.do", --%>
+<%-- 			url : "${pageContext.request.contextPath}/prod/prodView.do", --%>
 // 			method : "get",
 // 			data : {
 // 				what:what

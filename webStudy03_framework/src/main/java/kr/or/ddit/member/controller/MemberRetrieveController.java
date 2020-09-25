@@ -63,7 +63,7 @@ public class MemberRetrieveController {
 	@URIMapping(value = "/member/memberView.do", method = HttpMethod.GET)
 	public String memberDetailView(@RequestParameter(name="who", required = true, defaultValue = "") String who, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		MemberVO member = service.retrieveMember(who);
-		req.setAttribute("member", member);
+		req.setAttribute("loginMember", member);
 		String goPage = "member/memberView";
 		return goPage;
 	}

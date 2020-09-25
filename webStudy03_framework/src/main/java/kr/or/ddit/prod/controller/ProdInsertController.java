@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import kr.or.ddit.enumpkg.ServiceResult;
+import kr.or.ddit.filter.wrapper.FileUploadRequestWrapper;
+import kr.or.ddit.filter.wrapper.PartWrapper;
 import kr.or.ddit.mvc.annotation.CommandHandler;
 import kr.or.ddit.mvc.annotation.HttpMethod;
 import kr.or.ddit.mvc.annotation.URIMapping;
@@ -41,13 +43,23 @@ public class ProdInsertController {
 	}
 	
 	@URIMapping(value = "/prod/prodInsert.do", method = HttpMethod.POST)
-	public String doPost(@ModelData(name = "prod") ProdVO prod, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		String goPage = null;
-		String msg = null;
-	
+	public String doPost(@ModelData(name = "prod") ProdVO prod, HttpServletRequest req) throws ServletException, IOException {
+		// 검증 전에 prod_img 결정
+		if (req instanceof FileUploadRequestWrapper) {
+			
+			
+			PartWrapper partWrapper = ((FileUploadRequestWrapper) req).getPartWrapper("prod_image");
+			if (partWrapper != null) {
+				prod.setProd_image(partWrapper);
+			}
+		}
+		
 		Map<String, StringBuffer> errors = new LinkedHashMap<>();
 		req.setAttribute("errors", errors);
 		CommonValidator<ProdVO> validator = new CommonValidator<>();
+		
+		String goPage = null;
+		String msg = null;
 		boolean valid = validator.validate(prod, errors, InsertGroup.class);
 		if (valid) {
 			ServiceResult result = service.createProd(prod);

@@ -27,6 +27,8 @@
 		
 		lguItem.find("option[value!=<%= prod.getProd_lgu() %>]").remove();
 		buyerItem.find("option[value!=<%= prod.getProd_buyer() %>]").remove();
+		$("#imageDiv").append($("<img>").attr("src", "<%= request.getContextPath() %>/prodImages/<%= prod.getProd_img() %>"));
+		$("[name='prod_image']").attr("required", false);
 	});
 </script>		
 <%
@@ -35,15 +37,15 @@
 
 <body>
 <jsp:useBean id="errors" class="java.util.LinkedHashMap" scope="request"/>
-	<form method="post">
+	<form method="post" enctype="multipart/form-data">
 		<table>
 			<tr>
 				<th>상품코드</th>
 				<td>
 					<div class="form-group form-inline">
 						<input class="form-control mr-2" type="text" readonly name="prod_id" 
-							value="${prod.prod_id }" maxLength="10" />
-						<span class="error"><%=errors.get("prod_id") %></span>
+							value="${prod.prod_id}" maxLength="10" />
+						<span class="error">${errors.prod_id}</span>
 					</div>
 				</td>
 			</tr>
@@ -52,8 +54,8 @@
 				<td>
 					<div class="form-group form-inline">
 						<input class="form-control mr-2" type="text" required name="prod_name"
-							value="${prod.prod_name }" maxLength="40" />
-						<span class="error"><%=errors.get("prod_name") %></span>
+							value="${prod.prod_name}" maxLength="40" />
+						<span class="error">${errors.prod_name}</span>
 					</div>
 				</td>
 			</tr>
@@ -156,9 +158,9 @@
 				</td>
 			</tr>
 			<tr>
-				<th>상품이미지경로</th>
+				<th>상품이미지</th>
 				<td>
-					<div class="form-group form-inline">
+					<div class="form-group form-inline" id="imageDiv">
 						<input class="form-control mr-2" type="file" required name="prod_image"
 							value="${prod.prod_img }" maxLength="40" />
 						<span class="error"><%=errors.get("prod_img") %></span>

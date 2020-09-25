@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import kr.or.ddit.enumpkg.ServiceResult;
+import kr.or.ddit.filter.wrapper.FileUploadRequestWrapper;
+import kr.or.ddit.filter.wrapper.PartWrapper;
 import kr.or.ddit.member.service.IMemberService;
 import kr.or.ddit.member.service.MemberServiceImpl;
 import kr.or.ddit.mvc.annotation.CommandHandler;
@@ -25,20 +27,26 @@ public class MemberUpdateController {
 	
 	private IMemberService service = MemberServiceImpl.getInstance();
 	
-	@URIMapping(value = "/MemberUpdate.do", method = HttpMethod.GET)
+	@URIMapping(value = "/memberUpdate.do", method = HttpMethod.GET)
 	public String doGet(HttpServletRequest req, HttpServletResponse resp, HttpSession session) throws ServletException, IOException {
-		MemberVO authMember = (MemberVO) session.getAttribute("member");
+		MemberVO authMember = (MemberVO) session.getAttribute("loginMember");
 		MemberVO member = service.retrieveMember(authMember.getMem_id());
 		
-		req.setAttribute("member", member);
+		req.setAttribute("updateMember", member);
 		
 		String goPage = "member/modifyForm";
 		
 		return goPage;
 	}
 	
-	@URIMapping(value = "/MemberUpdate.do", method = HttpMethod.POST)
-	public String doPost(@ModelData(name = "member") MemberVO member, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	@URIMapping(value = "/memberUpdate.do", method = HttpMethod.POST)
+	public String doPost(@ModelData(name = "updateMember") MemberVO member, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		if (req instanceof FileUploadRequestWrapper) {
+			PartWrapper partWrapper = ((FileUploadRequestWrapper) req).getPartWrapper("mem_image");
+			if (partWrapper != null) {
+				member.setMem_image(partWrapper);
+			}
+		}
 		Map<String, StringBuffer> errors = new LinkedHashMap<String, StringBuffer>();
 		req.setAttribute("errors", errors);
 		

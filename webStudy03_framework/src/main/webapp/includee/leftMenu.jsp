@@ -1,3 +1,6 @@
+<%@page import="java.util.Map.Entry"%>
+<%@page import="kr.or.ddit.vo.MemberVO"%>
+<%@page import="java.util.Map"%>
 <%@page import="kr.or.ddit.enumpkg.ServiceType"%>
 <%@page import="kr.or.ddit.vo.MenuVO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -17,6 +20,17 @@
 		</a>
 	</li>
 	<%
+			}
+			
+			Map<String, MemberVO> userList = (Map<String, MemberVO>) application.getAttribute("userList");
+			
+			for (Entry<String, MemberVO> entry : userList.entrySet()) {
+				MemberVO member = entry.getValue();
+	%>
+	<li>
+		<ul><%= member.getMem_name() %></ul>
+	</li>
+	<%			
 			}
 	%>
 </ul>

@@ -6,7 +6,6 @@ import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import kr.or.ddit.enumpkg.ServiceResult;
@@ -23,21 +22,20 @@ public class MemberDeleteController {
 	
 	private IMemberService service = MemberServiceImpl.getInstance();
 	
-	@URIMapping(value = "/MemberDelete.do", method = HttpMethod.GET)
-	public String doGet(HttpServletRequest req, HttpServletResponse resp, HttpSession session) throws ServletException, IOException {
-		
-		MemberVO authMember = (MemberVO) session.getAttribute("member");
+	@URIMapping(value = "/memberDelete.do", method = HttpMethod.GET)
+	public String doGet(HttpServletRequest req, HttpSession session) throws ServletException, IOException {
+		MemberVO authMember = (MemberVO) session.getAttribute("loginMember");
 		MemberVO member = service.retrieveMember(authMember.getMem_id());
 		
-		req.setAttribute("member", member);
+		req.setAttribute("deleteMember", member);
 		
 		String goPage = "member/deleteForm";
 		
 		return goPage;
 	}
 	
-	@URIMapping(value = "/MemberDelete.do", method = HttpMethod.POST)
-	public String doPost(@ModelData(name = "member") MemberVO member, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	@URIMapping(value = "/memberDelete.do", method = HttpMethod.POST)
+	public String doPost(@ModelData(name = "member") MemberVO member, HttpServletRequest req) throws ServletException, IOException {
 		Map<String, StringBuffer> errors = new LinkedHashMap<String, StringBuffer>();
 		req.setAttribute("errors", errors);
 		

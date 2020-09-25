@@ -1,6 +1,6 @@
 <%@page import="java.util.Date"%>
 <%@page import="org.apache.commons.lang3.StringUtils"%>
-<%@page import="kr.or.ddit.vo.MemberVO"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -71,7 +71,7 @@
 			let mem_id = inputID.val();
 			
 			$.ajax({
-				url : "<%=request.getContextPath()%>/idCheck.do",
+				url : "${pageContext.request.contextPath}/idCheck.do",
 				data : {
 					mem_id : mem_id
 				},
@@ -94,66 +94,6 @@
 				}
 			})
 		});
-		<%-- var zipDiv = $("#result");
-		$("#search").on("click", function() {
-			zipSearchForm.submit(false);
-			let dongValue = $("[name='dong']").val();
-			
-			if (dongValue == null) {
-				alert("동을 입력하세요.");
-				return;
-			}
-			
-			data = {};
-			
-			data.dong = dongValue;
-			
-			$.ajax({
-				url : "<%= request.getContextPath() %>/zipSearch.do",
-				data : data,
-				method : "get",
-				dataType : "json",
-				success : function(resp) {
-					zipDiv.empty();
-					
-					var zipTable = $("<table id='zipTB' class='dispaly'></table>");
-					var zipThead = $("<thead></thead>");
-					var zipTbody = $("<tbody></tbody>");
-					var titleTr = $("<tr></tr>");
-					titleTr.append("<th>우편번호</th>");
-					titleTr.append("<th>주소</th>");
-					titleTr.append("<th>번지</th>");
-					titleTr.append("<th></th>");
-					
-					zipThead.append(titleTr);
-					$.each(resp, function(idx, dongList) {
-						var zipTr = $("<tr></tr>");
-						var zipCodeTd = $("<td>" + dongList.zipcode + "</td>");
-						var zipAddrTd = $("<td>" + dongList.sido + " " + dongList.gugun + " " + dongList.dong + "</td>");
-						var zipBunjiTd = $("<td>" + dongList.bunji + "</td>");
-						var zipBtn = $("<td><input class='btn btn-dark zipConfirm' type='button' value='확인' /></td>");
-						
-						zipTr.append(zipCodeTd);
-						zipTr.append(zipAddrTd);
-						zipTr.append(zipBunjiTd);
-						zipTr.append(zipBtn);
-						
-						zipTbody.append(zipTr);
-					});
-					zipTable.append(zipThead);
-					zipTable.append(zipTbody);
-					
-					zipDiv.html(zipTable);
-					$("#zipTB").dataTable({
-						"pagingType": "full_numbers"
-					});
-				},
-				error : function(errorResp) {
-					console.log(errorResp);
-				}
-			});
-		}); --%>
-		
 	<%
 		String msg = (String) request.getAttribute("msg");
 		if (StringUtils.isNotBlank(msg)) {
@@ -165,10 +105,8 @@
 	});
 </script>
 </head>
-<jsp:useBean id="member" class="kr.or.ddit.vo.MemberVO" scope="request" />
-<jsp:useBean id="errors" class="java.util.LinkedHashMap" scope="request" />
 <body>
-	<form class="cmxform form-inline" id="registForm" method="post">
+	<form class="cmxform form-inline" id="registForm" method="post" enctype="multipart/form-data">
 		<div class="container">
 			<div class="jumbotron">
 				<h4 class="dispaly4 text-center">회원 가입</h4>
@@ -177,9 +115,9 @@
 						<th>아이디</th>
 						<td>
 							<div class="form-group">
-								<input class="col-md-4" type="text" name="mem_id" value="${ member.mem_id }" maxlength="15" required />
+								<input class="col-md-4" type="text" name="mem_id" value="${registMember.mem_id}" maxlength="15" required />
 								<button class="btn btn-primary ml-2" type="button" id="checkBtn">중복 확인</button> 
-								<span class="error"> ${ errors.get("mem_id") } </span>
+								<span class="error"> ${errors.get("mem_id")} </span>
 							</div>
 						</td>
 					</tr>
@@ -187,7 +125,7 @@
 						<th>비밀번호</th>
 						<td>
 							<div class="form-group">
-								<input class="col-md-4" type="password" name="mem_pass"	value="${ member.getMem_pass() }" maxlength="15" required /> 
+								<input class="col-md-4" type="password" name="mem_pass"	value="${registMember.mem_pass}" maxlength="15" required /> 
 								<span class='error'> ${ errors.get("mem_pass") } </span>
 							</div>
 						</td>
@@ -196,7 +134,7 @@
 						<th>회원명</th>
 						<td>
 							<div class="form-group">
-								<input class="col-md-4" type="text" name="mem_name"	value="${ member.getMem_name() }" maxlength="20" required /> 
+								<input class="col-md-4" type="text" name="mem_name"	value="${registMember.mem_name}" maxlength="20" required /> 
 								<span class='error'> ${ errors.get("mem_name") } </span>
 							</div>
 						</td>
@@ -204,33 +142,42 @@
 					<tr>
 						<th>주민번호</th>
 						<td>
-							<input class="mr-2" type="text" name="mem_regno1" value="${ member.getMem_regno1() }" maxlength="6" pattern="[0-9]{6}" required />
-							<input class="ml-2" type="text" name="mem_regno2" value="${ member.getMem_regno2() }" maxlength="7" pattern="[0-9]{7}" required />
-							<span class='error'> ${ errors.get("mem_regno1") } </span>
-							<span class='error'> ${ errors.get("mem_regno2") } </span>
+							<input class="mr-2" type="text" name="mem_regno1" value="${registMember.mem_regno1}" maxlength="6" pattern="[0-9]{6}" required />
+							<input class="ml-2" type="text" name="mem_regno2" value="${registMember.mem_regno2}" maxlength="7" pattern="[0-9]{7}" required />
+							<span class='error'>${errors.get("mem_regno1")}</span>
+							<span class='error'>${errors.get("mem_regno2")}</span>
 						</td>
 					</tr>
 					<tr>
 						<th>생일</th>
 						<td>
-							<input type="date" name="mem_bir" value="${ member.getMem_bir() }" pattern="\d{4}-\d{2}-\d{2}" />
-							<span class='error'> ${ errors.get("mem_bir") } </span>
+							<input type="date" name="mem_bir" value="${registMember.mem_bir}" pattern="\d{4}-\d{2}-\d{2}" />
+							<span class='error'>${errors.get("mem_bir")}</span>
+						</td>
+					</tr>
+					<tr>
+						<th>프로필 사진</th>
+						<td>
+							<input type="file" name="mem_image" />
+							<span class='error'>${errors.get("mem_img")}</span>
 						</td>
 					</tr>
 					<tr>
 						<th>우편번호</th>
 						<td>
-							<input type="text" name="mem_zip" value="${ member.getMem_zip() }" maxlength="7" pattern="[0-9]{2,3}-[0-9]{2,3}" readonly required />
+							<input type="text" name="mem_zip" value="${registMember.mem_zip}" 
+								maxlength="7" pattern="[0-9]{2,3}-[0-9]{2,3}" readonly required />
 							<button type="button" class="btn btn-dark ml-2" data-toggle="modal" data-target="#zipSearchModal">우편번호 검색</button>
-							<span class='error'> ${ errors.get("mem_zip") } </span>
+							<span class='error'>${errors.get("mem_zip")}</span>
 						</td>
 					</tr>
 					<tr>
 						<th>주소</th>
 						<td>
 							<div class="form-group">
-								<input class="col-md-6" type="text" name="mem_add1" value="${ member.getMem_add1() }" maxlength="100" readonly required />
-								<span class='error'> ${ errors.get("mem_add1") } </span>
+								<input class="col-md-6" type="text" name="mem_add1" value="${registMember.mem_add1}" 
+									maxlength="100" readonly required />
+								<span class='error'>${errors.get("mem_add1")}</span>
 							</div>
 						</td>
 					</tr>
@@ -238,8 +185,9 @@
 						<th>상세주소</th>
 						<td>
 							<div class="form-group">
-								<input class="col-md-6" type="text" name="mem_add2" value="${ member.getMem_add2() }" maxlength="80"  required />
-								<span class='error'> ${ errors.get("mem_add2") } </span>
+								<input class="col-md-6" type="text" name="mem_add2" value="${registMember.mem_add2}" 
+									maxlength="80"  required />
+								<span class='error'>${errors.get("mem_add2")}</span>
 							</div>
 						</td>
 					</tr>
@@ -247,8 +195,9 @@
 						<th>집전화번호</th>
 						<td>
 							<div class="form-group">
-								<input class="col-md-4" type="text" required name="mem_hometel" value="${ member.getMem_hometel() }" maxlength="14" pattern="[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}" required />
-								<span class='error'> ${ errors.get("mem_hometel") } </span>
+								<input class="col-md-4" type="text" required name="mem_hometel" value="${registMember.mem_hometel}" 
+										maxlength="14" pattern="[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}" required />
+								<span class='error'> ${errors.get("mem_hometel")}</span>
 							</div>
 						</td>
 					</tr>
@@ -256,44 +205,50 @@
 						<th>회사전화번호</th>
 						<td>
 							<div class="form-group">
-								<input class="col-md-4" type="text" name="mem_comtel" value="${ member.getMem_comtel() }" maxlength="14" pattern="[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}" required />
-								<span class='error'> ${ errors.get("mem_comtel") } </span>
+								<input class="col-md-4" type="text" name="mem_comtel" value="${ member.getMem_comtel() }" 
+									maxlength="14" pattern="[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}" required />
+								<span class='error'> ${errors.get("mem_comtel")}</span>
 							</div>
 						</td>
 					</tr>
 					<tr>
 						<th>휴대폰번호</th>
 						<td>
-							<input type="text" name="mem_hp" value="${ member.getMem_hp() }" maxlength="15" pattern="[0-9]{3}-[0-9]{3,4}-[0-9]{4}" required />
-							<span class='error'> ${ errors.get("mem_hp") } </span>
+							<input type="text" name="mem_hp" value="${registMember.mem_hp}" 
+								maxlength="15" pattern="[0-9]{3}-[0-9]{3,4}-[0-9]{4}" required />
+							<span class='error'>${errors.get("mem_hp")}</span>
 						</td>
 					</tr>
 					<tr>
 						<th>직업</th>
 						<td>
-							<input type="text" name="mem_job" value="${ member.getMem_job() }" maxlength="40" />
-							<span class='error'> ${ errors.get("mem_job") } </span>
+							<input type="text" name="mem_job" value="${registMember.mem_job}" 
+								maxlength="40" />
+							<span class='error'>${errors.get("mem_job")}</span>
 						</td>
 					</tr>
 					<tr>
 						<th>취미</th>
 						<td>
-							<input type="text" name="mem_like" value="${ member.getMem_like() }" maxlength="40" />
-							<span class='error'> ${ errors.get("mem_like") } </span>
+							<input type="text" name="mem_like" value="${registMember.mem_like}" 
+								maxlength="40" />
+							<span class='error'>${errors.get("mem_like")}</span>
 						</td>
 					</tr>
 					<tr>
 						<th>기념일</th>
 						<td>
-							<input type="text" name="mem_memorial" value="${ member.getMem_memorial() }" maxlength="40" />
-							<span class='error'> ${ errors.get("mem_memorial") } </span>
+							<input type="text" name="mem_memorial" value="${registMember.mem_memorial}" 
+								maxlength="40" />
+							<span class='error'>${errors.get("mem_memorial")}</span>
 						</td>
 					</tr>
 					<tr>
 						<th>기념일자</th>
 						<td>
-							<input type="date" name="mem_memorialday" value="${ member.getMem_memorialday() }"  pattern="\d{4}-\d{2}-\d{2}" />
-							<span class='error'> ${ errors.get("mem_memorialday") } </span>
+							<input type="date" name="mem_memorialday" value="${registMember.mem_memorialday}"  
+								pattern="\d{4}-\d{2}-\d{2}" />
+							<span class='error'>${errors.get("mem_memorialday")}</span>
 						</td>
 					</tr>
 					<tr>
@@ -314,7 +269,7 @@
 	</form>
 	<div id="modalDiv">
 	</div>
-	<script type="text/javascript" src="<%=request.getContextPath() %>/js/zip.js"></script>
+	<script type="text/javascript" src="${pageContext.request.contextPath}/js/zip.js"></script>
 	<script type="text/javascript">
 		let modalDiv = $("#modalDiv");
 		let zipcode = $("[name='mem_zip']");
@@ -330,7 +285,7 @@
 		$("registForm").zipSearch({
 			tag : tag,
 			command : "regist",
-			url : "<%= request.getContextPath() %>/dataTable.do",
+			url : "${pageContext.request.contextPath}/dataTable.do",
 		});
 	</script>
 </body>

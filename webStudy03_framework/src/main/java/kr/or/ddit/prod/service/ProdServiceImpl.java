@@ -1,9 +1,16 @@
 package kr.or.ddit.prod.service;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+
+import kr.or.ddit.db.CustomSqlSessionFactoryBuilder;
 import kr.or.ddit.enumpkg.ServiceResult;
 import kr.or.ddit.exception.CustomException;
+import kr.or.ddit.listener.SampleListener;
 import kr.or.ddit.prod.dao.IProdDAO;
 import kr.or.ddit.prod.dao.ProdDAOImpl;
 import kr.or.ddit.vo.PagingVO;
@@ -15,7 +22,15 @@ public class ProdServiceImpl implements IProdService {
 	
 	private static IProdService service;
 	
-	private ProdServiceImpl() { }
+	private SqlSessionFactory sqlSessionFactory = CustomSqlSessionFactoryBuilder.getSqlSessionFactory();
+	
+	private File folder;
+	
+	private ProdServiceImpl() {
+		String folderURL = "/prodImages";
+		String folderPath = SampleListener.currentContext.getRealPath(folderURL);
+		folder = new File(folderPath);
+	}
 	
 	public static IProdService getInstance() {
 		if (service == null) {
@@ -26,14 +41,23 @@ public class ProdServiceImpl implements IProdService {
 
 	@Override
 	public ServiceResult createProd(ProdVO prod) {
-		ServiceResult result = null;
-		int insertResult = dao.insertProd(prod);
-		if (insertResult > 0) {
-			result = ServiceResult.OK;
-		} else {
-			result = ServiceResult.FAILED;
+		try (
+				SqlSession session = sqlSessionFactory.openSession()
+		) {
+			int insertResult = dao.insertProd(prod, session);
+			// 파일 업로드
+			prod.getProd_image().saveToRealPath(folder);
+			
+			ServiceResult result = ServiceResult.FAILED;
+			if (insertResult > 0) {
+				result = ServiceResult.OK;
+				session.commit();
+			}
+			return result;
+			
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
-		return result;
 	}
 
 	@Override
@@ -58,13 +82,23 @@ public class ProdServiceImpl implements IProdService {
 
 	@Override
 	public ServiceResult modifyProd(ProdVO prod) {
-		ServiceResult result = null;
-		int updateResult = dao.updateProd(prod);
-		if (updateResult > 0) {
-			result = ServiceResult.OK;
-		} else {
-			result = ServiceResult.FAILED;
+		try (
+				SqlSession session = sqlSessionFactory.openSession();
+		) {
+			int updateResult = dao.updateProd(prod, session);
+			
+			if (prod.getProd_image() != null) {
+				prod.getProd_image().saveToRealPath(folder);
+			}
+			
+			ServiceResult result  = ServiceResult.FAILED;
+			if (updateResult > 0) {
+				result = ServiceResult.OK;
+				session.commit();
+			}
+			return result;
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
-		return result;
 	}
 }

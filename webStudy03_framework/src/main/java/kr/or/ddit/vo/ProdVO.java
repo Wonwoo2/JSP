@@ -6,6 +6,8 @@ import java.util.List;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+import kr.or.ddit.filter.wrapper.PartWrapper;
+import kr.or.ddit.validate.InsertGroup;
 import kr.or.ddit.validate.UpdateGroup;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,9 +48,16 @@ public class ProdVO implements Serializable {
 	private String prod_outline;
 	@Size(max = 4000)
 	private String prod_detail;
-	@NotBlank
-	@Size(max = 40)
-	private String prod_img;
+	@NotBlank(groups = InsertGroup.class)
+	@Size(max = 40, groups = InsertGroup.class)
+	private String prod_img;			// database data
+	private PartWrapper prod_image;		// client data 
+	public void setProd_image(PartWrapper prod_image) {
+		this.prod_image = prod_image;
+		if (prod_image != null) {
+			this.prod_img = prod_image.getSaveName();
+		}
+	}
 	private Integer prod_totalstock;
 	@Size(max = 7)
 	private String prod_insdate;

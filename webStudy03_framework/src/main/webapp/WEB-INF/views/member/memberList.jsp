@@ -1,6 +1,4 @@
-<%@page import="java.util.List"%>
-<%@page import="kr.or.ddit.vo.MemberVO"%>
-<%@page import="kr.or.ddit.vo.PagingVO"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -11,9 +9,6 @@
 <jsp:include page="/includee/preScript.jsp" />
 </head>
 <body>
-	<%
-		PagingVO<MemberVO> pagingVO = (PagingVO) request.getAttribute("pagingVO");
-	%>
 	<table id="memberTable" class="table table-bordered">
 		<thead>
 			<tr>
@@ -25,46 +20,44 @@
 			</tr>
 		</thead>
 		<tbody>
-			<%
-				List<MemberVO> datalist = pagingVO.getData();
-				if (datalist != null && datalist.size() > 0) {
-					for (MemberVO member : datalist) {
-			%>
-			<tr>
-				<td><%=member.getMem_id()%></td>
-				<td><a href="#" data-who="<%=member.getMem_id()%>"><%=member.getMem_name()%></a></td>
-				<td><%=member.getMem_hp()%></td>
-				<td><%=member.getMem_add1()%></td>
-				<td><%=member.getMem_mileage()%></td>
-			</tr>
-			<%
-				}
-				} else {
-			%>
-			<tr>
-				<td colspan="6">검색 조건에 맞는 회원이 없음.</td>
-			</tr>
-			<%
-				}
-			%>
+			<c:set var="memberList" value="${paginVO.data}"></c:set>
+			<c:choose>
+				<c:when test="${not empty memberList}">
+					<c:forEach items="${memberList}" var="member">
+						<tr>
+							<td>${member.mem_id}</td>
+							<td><a href="#" data-who="${member.mem_id}">${member.mem_name}</a></td>
+							<td>${member.mem_hp}</td>
+							<td>${member.mem_add1}</td>
+							<td>${member.mem_mileage}</td>
+						</tr>
+					</c:forEach>
+				</c:when>
+				<c:otherwise>
+					<tr>
+						<td colspan="6">검색 조건에 맞는 회원이 없음.</td>
+					</tr>
+				</c:otherwise>
+			</c:choose>
 		</tbody>
 		<tfoot>
 			<tr>
-				<td colspan="6" id="pagingArea"><%=pagingVO.getPagingHTML_BS()%>
+				<td colspan="6" id="pagingArea">
+					${pagingVO.pagingHTML_BS}
 				</td>
 			</tr>
 		</tfoot>
 	</table>
-	<form id="searchForm"
-		action="<%=request.getContextPath()%>/member/memberList.do"
-		class="form-inline">
-		<input type="hidden" name="page" /> <select name='searchType'
-			class="form-control">
+	<c:url value="/member/memberList.do" var="memberListURL" />
+	<form id="searchForm" action="${memberListURL}" class="form-inline">
+		<input type="hidden" name="page" /> 
+		<select name='searchType' class="form-control">
 			<option value="all">전체</option>
 			<option value="name">이름</option>
 			<option value="address">지역</option>
-		</select> <input type="text" class="form-control" name="searchWord" /> <input
-			type="submit" class="btn btn-primary" value="검색" />
+		</select> 
+		<input type="text" class="form-control" name="searchWord" /> 
+		<input type="submit" class="btn btn-primary" value="검색" />
 	</form>
 	<div class="modal fade" id="memberViewModal" tabindex="-1"
 		aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -144,7 +137,7 @@
 			let who = $(this).data("who"); 
 			console.log(who);
 			$.ajax({
-				url : "<%=request.getContextPath()%>/member/memberView.do",
+				url : "${pageContext.request.contextPath}/member/memberView.do",
 				method : "get",
 				data : {
 					who:who

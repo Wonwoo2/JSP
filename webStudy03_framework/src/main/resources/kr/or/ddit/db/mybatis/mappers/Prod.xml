@@ -87,7 +87,9 @@
 						prod_sale = #{prod_sale, jdbcType=NUMERIC},
 						prod_outline = #{prod_outline, jdbcType=VARCHAR},
 						prod_detail = #{prod_detail, jdbcType=VARCHAR},
-						prod_img = #{prod_img, jdbcType=VARCHAR},
+						<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(prod_img)">
+							prod_img = #{prod_img, jdbcType=VARCHAR},
+						</if>
 						prod_totalstock = #{prod_totalstock, jdbcType=NUMERIC},
 						prod_properstock = #{prod_properstock, jdbcType=NUMERIC},
 						prod_size = #{prod_size, jdbcType=VARCHAR},

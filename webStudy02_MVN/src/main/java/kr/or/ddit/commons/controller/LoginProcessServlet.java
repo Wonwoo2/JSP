@@ -19,6 +19,8 @@ import kr.or.ddit.utils.CookieUtils;
 import kr.or.ddit.utils.CookieUtils.TextType;
 import kr.or.ddit.vo.MemberVO;
 
+
+
 @WebServlet("/login/loginProcess.do")
 public class LoginProcessServlet extends HttpServlet {
 	/**
@@ -68,7 +70,7 @@ public class LoginProcessServlet extends HttpServlet {
 		if (result instanceof MemberVO) {
 			goPage = "/";
 			
-			session.setAttribute("authMember", result);
+			session.setAttribute("loginMember", result);
 			
 			if("save".equals(saveId)) {
 				maxAge = 60 * 60 * 24 * 7;

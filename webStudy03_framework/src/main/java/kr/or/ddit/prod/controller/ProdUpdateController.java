@@ -1,11 +1,14 @@
 package kr.or.ddit.prod.controller;
 
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import kr.or.ddit.enumpkg.ServiceResult;
+import kr.or.ddit.filter.wrapper.FileUploadRequestWrapper;
+import kr.or.ddit.filter.wrapper.PartWrapper;
 import kr.or.ddit.mvc.annotation.CommandHandler;
 import kr.or.ddit.mvc.annotation.HttpMethod;
 import kr.or.ddit.mvc.annotation.URIMapping;
@@ -41,7 +44,18 @@ public class ProdUpdateController {
 	
 	@URIMapping(value = "/prod/prodUpdate.do", method = HttpMethod.POST)
 	public String modifyProd(@ModelData(name = "prod") ProdVO prod,
-			HttpServletRequest request) {
+			HttpServletRequest request) throws IOException {
+		
+		// 검증 전에 prod_img 결정
+		if (request instanceof FileUploadRequestWrapper) {
+			// 파일 업로드
+
+			PartWrapper partWrapper = ((FileUploadRequestWrapper) request).getPartWrapper("prod_image");
+			if (partWrapper != null) {
+				prod.setProd_image(partWrapper);
+			}
+		}
+		
 		String goPage = null;
 		String msg = null;
 	

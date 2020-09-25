@@ -39,6 +39,6 @@ public class IProdDAOTest {
 						.prod_unit("ㅁㄴ")
 						.build();
 		
-		assertNotEquals(0, dao.insertProd(prod));
+		assertNotEquals(0, dao.insertProd(prod, null));
 	}
 }

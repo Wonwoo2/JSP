@@ -45,7 +45,7 @@ public class LoginProcessServlet {
 		if (result instanceof MemberVO) {
 			goPage = "redirect:/";
 			
-			session.setAttribute("member", result);
+			session.setAttribute("loginMember", result);
 			
 			if("save".equals(saveId)) {
 				maxAge = 60 * 60 * 24 * 7;

@@ -3,15 +3,15 @@
 <mapper namespace="kr.or.ddit.member.dao.IMemberDAO">
 	<insert id="insertMember" parameterType="MemberVO">
 		INSERT INTO
-		member(mem_id, mem_pass, mem_name, mem_regno1, mem_regno2, mem_bir,
-		mem_zip, mem_add1, mem_add2, mem_hometel, mem_comtel, mem_hp,
-		mem_job, mem_like, mem_memorial, mem_memorialday, mem_mileage, mem_delete, mem_role)
+		member(mem_id, mem_pass, mem_name, mem_regno1, mem_regno2, mem_bir,	mem_zip, mem_add1, 
+		mem_add2, mem_hometel, mem_comtel, mem_hp, mem_job, mem_like, mem_memorial, mem_memorialday, 
+		mem_mileage, mem_delete, mem_role, mem_img)
 		VALUES(#{mem_id}, #{mem_pass}, #{mem_name}, #{mem_regno1}, #{mem_regno2}, 
 			TO_DATE(#{mem_bir, jdbcType=DATE}, 'YYYY-MM-DD'), #{mem_zip}, #{mem_add1}, 
 			#{mem_add2}, #{mem_hometel}, #{mem_comtel}, #{mem_hp, jdbcType=VARCHAR},
 			#{mem_job, jdbcType=VARCHAR}, #{mem_like, jdbcType=VARCHAR}, #{mem_memorial, jdbcType=VARCHAR}, 
 			TO_DATE(#{mem_memorialday, jdbcType=DATE}, 'YYYY-MM-DD'), #{mem_mileage, jdbcType=NUMERIC}, 
-			#{mem_delete, jdbcType=VARCHAR}, 'ROLE_USER')
+			#{mem_delete, jdbcType=VARCHAR}, 'ROLE_USER', #{mem_img, jdbcType=BLOB})
 	</insert>
 
 	<sql id="searchFrag">
@@ -65,11 +65,14 @@
 
 	<select id="selectMember" parameterType="string" resultMap="memberMap">
 		WITH memcart AS(
-		SELECT DISTINCT mem_id, mem_pass, mem_name, mem_regno1, mem_regno2, to_char(mem_bir,'yyyy-mm-dd') mem_bir,
+		SELECT mem_id, mem_pass, mem_name, mem_regno1, mem_regno2, to_char(mem_bir,'yyyy-mm-dd') mem_bir,
 				mem_zip, mem_add1, mem_add2, mem_hometel, mem_comtel, mem_hp, mem_job, mem_like, mem_memorial, 
-				TO_CHAR(mem_memorialday, 'yyyy-mm-dd') mem_memorialday, mem_mileage, mem_delete, mem_role,
+				TO_CHAR(mem_memorialday, 'yyyy-mm-dd') mem_memorialday, mem_mileage, mem_delete, mem_role, mem_img,
 				cart_member, cart_prod
-			FROM member LEFT OUTER JOIN CART 
+			FROM member LEFT OUTER JOIN (
+				SELECT DISTINCT cart_member, cart_prod
+				FROM cart
+			) 
 			ON (mem_id = cart_member)
 			WHERE mem_id = #{mem_id}
 		)
@@ -82,16 +85,17 @@
 	<update id="updateMember" parameterType="MemberVO">
 		UPDATE member
 		<set>
-			<if test="mem_pass != null">mem_pass = #{mem_pass},</if>
-			<if test="mem_name != null">mem_name = #{mem_name},</if>
-			<if test="mem_zip != null">mem_zip = #{mem_zip},</if>
-			<if test="mem_add1 != null">mem_add1 = #{mem_add1},</if>
-			<if test="mem_hometel != null">mem_hometel = #{mem_hometel},</if>
-			<if test="mem_comtel != null">mem_comtel = #{mem_comtel},</if>
-			<if test="mem_job != null">mem_job = #{mem_job, jdbcType=VARCHAR},</if>
-			<if test="mem_like != null">mem_like = #{mem_like, jdbcType=VARCHAR},</if>
-			<if test="mem_memorial != null">mem_memorial = #{mem_memorial, jdbcType=VARCHAR},</if>
-			<if test="mem_memorialday != null">mem_memorialday = TO_DATE(#{mem_memorialday,	jdbcType=DATE}, 'YYYY-MM-DD')</if>
+			<if test="mem_pass neq null">mem_pass = #{mem_pass},</if>
+			<if test="mem_name neq null">mem_name = #{mem_name},</if>
+			<if test="mem_zip neq null">mem_zip = #{mem_zip},</if>
+			<if test="mem_add1 neq null">mem_add1 = #{mem_add1},</if>
+			<if test="mem_hometel neq null">mem_hometel = #{mem_hometel},</if>
+			<if test="mem_comtel neq null">mem_comtel = #{mem_comtel},</if>
+			<if test="mem_job neq null">mem_job = #{mem_job, jdbcType=VARCHAR},</if>
+			<if test="mem_like neq null">mem_like = #{mem_like, jdbcType=VARCHAR},</if>
+			<if test="mem_memorial neq null">mem_memorial = #{mem_memorial, jdbcType=VARCHAR},</if>
+			<if test="mem_memorialday neq null">mem_memorialday = TO_DATE(#{mem_memorialday,	jdbcType=DATE}, 'YYYY-MM-DD')</if>
+			<if test="mem_img neq null"></if>
 		</set>
 		WHERE mem_id = #{mem_id}
 	</update>
