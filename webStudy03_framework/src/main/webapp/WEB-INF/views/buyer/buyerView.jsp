@@ -23,7 +23,7 @@
 		</tr>
 		<tr>
 			<th>거래처분류</th>
-			<td>${buyer.buyer_lgu}</td>
+			<td>${buyer.lprod_nm}</td>
 		</tr>
 		<tr>
 			<th>은행</th>
@@ -70,6 +70,10 @@
 			<td>${buyer.buyer_telext}</td>
 		</tr>
 		<tr>
+			<th>삭제여부</th>
+			<td>${buyer.buyer_delete}</td>
+		</tr>
+		<tr>
 			<th>거래물품</th>
 			<td>
 				<table class="table-bordered">
@@ -105,6 +109,23 @@
 						</c:choose>
 					</tbody>
 				</table>
+			</td>
+		</tr>
+		<tr>
+			<c:url value="/buyer/buyerRegist.do" var="registBuyerURL"/>
+			<c:url value="/buyer/buyerModify.do" var="modifyBuyerURL">
+				<c:param name="what" value="${buyer.buyer_id}" />
+			</c:url>
+			<c:url value="/buyer/buyerDelete.do" var="deleteBuyerURL">
+				<c:param name="what" value="${buyer.buyer_id}" />
+			</c:url>
+			<td colspan="2">
+				<input class="btn btn-info" type="button" value="등록" 
+					onclick="location.href='${registBuyerURL}';" />
+				<input class="btn btn-info" type="button" value="수정" 
+					onclick="location.href='${modifyBuyerURL}';" />
+				<input class="btn btn-info" type="button" value="삭제" 
+					onclick="location.href='${deleteBuyerURL}';" />
 			</td>
 		</tr>
 	</table>

@@ -1,16 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.or.ddit.buyer.dao.IBuyerDAO">
+	<insert id="insertBuyer" parameterType="BuyerVO">
+		<selectKey resultType="string" order="BEFORE" keyProperty="buyer_lgu">
+			SELECT #{buyer_lgu} || LPAD(NVL(TO_NUMBER(SUBSTR(MAX(buyer_id), 5)), 0) + 1, 2, '0') AS buyer_id
+			FROM buyer
+			WHERE buyer_lgu = #{buyer_lgu}
+		</selectKey>
+		INSERT INTO buyer(buyer_id, buyer_name, buyer_lgu, buyer_bank, buyer_bankno, buyer_bankname, buyer_zip, 
+					buyer_add1, buyer_add2, buyer_comtel, buyer_fax, buyer_mail, buyer_charger, buyer_telext)
+		VALUE(#{buyer_id, jdbcType=VARCHAR}, #{buyer_name, jdbcType=VARCHAR}, #{buyer_lgu, jdbcType=VARCHAR}, 
+			#{buyer_bank, jdbcType=VARCHAR}, #{buyer_bankno, jdbcType=VARCHAR}, #{buyer_bankname, jdbcType=VARCHAR}, 
+			#{buyer_zip, jdbcType=VARCHAR},	#{buyer_add1, jdbcType=VARCHAR}, #{buyer_add2, jdbcType=VARCHAR}, 
+			#{buyer_comtel, jdbcType=VARCHAR}, #{buyer_fax, jdbcType=VARCHAR}, #{buyer_mail, jdbcType=VARCHAR}, 
+			#{buyer_charger, jdbcType=VARCHAR}, #{buyer_telext, jdbcType=VARCHAR})
+	</insert>
+	<update id="updateBuyer" parameterType="BuyerVO">
+		UPDATE buyer SET
+			<if test="buyer_name neq null">
+				buyer_name = #{buyer_name, jdbcType=VARCHAR},
+			</if>
+			<if test="buyer_bank neq null">
+				buyer_bank = #{buyer_bank, jdbcType=VARCHAR},
+			</if>
+			<if test="buyer_bankno neq null">
+				buyer_bankno = #{buyer_bankno, jdbcType=VARCHAR},
+			</if>
+			<if test="buyer_bankname neq null">
+				buyer_bankname = #{buyer_bankname, jdbcType=VARCHAR},
+			</if>
+			<if test="buyer_zip neq null">
+				buyer_zip = #{buyer_zip, jdbcType=VARCHAR},
+			</if>
+			<if test="buyer_addr1 neq null">
+				buyer_addr1 = #{buyer_addr1, jdbcType=VARCHAR},
+			</if>
+			<if test="buyer_addr2 neq null">
+				buyer_addr2 = #{buyer_addr2, jdbcType=VARCHAR},
+			</if>
+			<if test="buyer_comtel neq null">
+				buyer_comtel = #{buyer_comtel, jdbcType=VARCHAR},
+			</if>
+			<if test="buyer_fax neq null">
+				buyer_fax = #{buyer_fax, jdbcType=VARCHAR},
+			</if>
+			<if test="buyer_mail neq null">
+				buyer_mail = #{buyer_mail, jdbcType=VARCHAR},
+			</if>
+			<if test="buyer_charger neq null">
+				buyer_charger = #{buyer_charger, jdbcType=VARCHAR},
+			</if>
+			<if test="buyer_charger neq null">
+				buyer_telext = #{buyer_telext, jdbcType=VARCHAR},
+			</if>
+		WHERE buyer_id = #{buyer_id, jdbcType=VARCHAR}
+	</update>
+	<delete id="deleteBuyer" parameterType="string">
+		UPDATE buyer SET 
+		buyer_delete = 'Y'
+		WHERE buyer_id = #{buyer_id, jdbcType=VARCHAR}
+	</delete>
+	
 	<resultMap type="BuyerVO" id="BuyerMap" autoMapping="true">
 		<id property="buyer_id" column="buyer_id" />
 		<collection property="prodList" ofType="ProdVO" autoMapping="true"></collection>
 	</resultMap>
 	<select id="selectBuyer" parameterType="string" resultMap="BuyerMap">
-	
 		WITH buyerview AS(
 			SELECT buyer_id,    buyer_name,    buyer_lgu,    buyer_bank, buyer_bankno, buyer_bankname, 
 			buyer_zip, buyer_add1, buyer_add2, buyer_comtel, buyer_fax, buyer_mail, buyer_charger, buyer_telext, 
-			lprod_nm
+			buyer_delete, lprod_nm
 			FROM buyer INNER JOIN lprod ON(buyer_lgu = lprod_gu)
 			WHERE buyer_id = #{buyer_id}
 		)
@@ -18,5 +77,30 @@
                 prod_id, prod_name, prod_lgu, prod_buyer, prod_cost, prod_price, prod_sale, 
                 prod_outline, prod_detail, prod_size
 		FROM buyerview LEFT JOIN prod ON(buyer_id = prod_buyer)
+	</select>
+	<sql id="searchFrag">
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="searchDetail neq null">
+				<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(searchDetail.buyer_name)">
+					AND INSTR(buyer_name, #{searchDetail.buyer_name}) > 0
+				</if>
+			</if>
+		</trim>
+	</sql>
+	<select id="selectBuyerCount" parameterType="PagingVO" resultType="int">
+		SELECT COUNT(*)
+		FROM buyer
+		<include refid="searchFrag" />
+	</select>
+	<select id="selectBuyerList" parameterType="PagingVO" resultType="BuyerVO">
+		SELECT A.*
+		FROM
+		(SELECT ROWNUM rn, buyer_id, buyer_name, buyer_lgu, buyer_bank, buyer_bankno, buyer_bankname,
+				buyer_zip, buyer_add1, buyer_add2, buyer_comtel, buyer_fax, buyer_mail,
+				buyer_charger, buyer_telext, buyer_delete, lprod_nm
+			FROM buyer INNER JOIN lprod ON(buyer_lgu = lprod_gu)
+			<include refid="searchFrag" />
+		) A
+		WHERE rn BETWEEN #{startRow} AND #{endRow}
 	</select>
 </mapper>

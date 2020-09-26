@@ -21,6 +21,27 @@
 						#{prod_qtysale, jdbcType=NUMERIC}, #{prod_mileage, jdbcType=NUMERIC}
 					)
 	</insert>
+	<update id="updateProd" parameterType="ProdVO">
+		UPDATE prod SET prod_name = #{prod_name, jdbcType=VARCHAR},
+						prod_cost = #{prod_cost, jdbcType=NUMERIC},
+						prod_price = #{prod_price, jdbcType=NUMERIC},
+						prod_sale = #{prod_sale, jdbcType=NUMERIC},
+						prod_outline = #{prod_outline, jdbcType=VARCHAR},
+						prod_detail = #{prod_detail, jdbcType=VARCHAR},
+						<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(prod_img)">
+							prod_img = #{prod_img, jdbcType=VARCHAR},
+						</if>
+						prod_totalstock = #{prod_totalstock, jdbcType=NUMERIC},
+						prod_properstock = #{prod_properstock, jdbcType=NUMERIC},
+						prod_size = #{prod_size, jdbcType=VARCHAR},
+						prod_color = #{prod_color, jdbcType=VARCHAR},
+						prod_delivery = #{prod_delivery, jdbcType=VARCHAR},
+						prod_unit = #{prod_unit, jdbcType=VARCHAR},
+						prod_qtyin = #{prod_qtyin, jdbcType=NUMERIC},
+						prod_qtysale = #{prod_qtysale, jdbcType=NUMERIC},
+						prod_mileage = #{prod_mileage, jdbcType=NUMERIC}
+		WHERE prod_id = #{prod_id, jdbcType=VARCHAR}
+	</update>
 	
 	<resultMap type="ProdVO" id="ProdMap" autoMapping="true">
 		<id property="prod_id" column="prod_id" />
@@ -35,7 +56,7 @@
 			FROM cart INNER JOIN member ON(cart_member = mem_id)
 		), prodview AS (
 			SELECT prod_id, prod_name, prod_lgu, prod_buyer, prod_cost, prod_price, prod_sale, prod_outline,
-			prod_detail, prod_img, prod_totalstock, TO_CHAR(prod_insdate, 'YYYY-MM-DD'), prod_properstock, 
+			prod_detail, prod_img, prod_totalstock, TO_CHAR(prod_insdate, 'YYYY-MM-DD') prod_insdate, prod_properstock, 
 			prod_size, prod_color, prod_delivery, prod_unit, prod_qtyin, prod_qtysale, prod_mileage, lprod_nm,
 			buyer_id, buyer_name, buyer_charger, buyer_add1
 			FROM prod INNER JOIN lprod ON(prod_lgu = lprod_gu)
@@ -79,26 +100,4 @@
 		) A	
 		WHERE rn BETWEEN #{startRow} AND #{endRow}
 	</select>
-	
-	<update id="updateProd" parameterType="ProdVO">
-		UPDATE prod SET prod_name = #{prod_name, jdbcType=VARCHAR},
-						prod_cost = #{prod_cost, jdbcType=NUMERIC},
-						prod_price = #{prod_price, jdbcType=NUMERIC},
-						prod_sale = #{prod_sale, jdbcType=NUMERIC},
-						prod_outline = #{prod_outline, jdbcType=VARCHAR},
-						prod_detail = #{prod_detail, jdbcType=VARCHAR},
-						<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(prod_img)">
-							prod_img = #{prod_img, jdbcType=VARCHAR},
-						</if>
-						prod_totalstock = #{prod_totalstock, jdbcType=NUMERIC},
-						prod_properstock = #{prod_properstock, jdbcType=NUMERIC},
-						prod_size = #{prod_size, jdbcType=VARCHAR},
-						prod_color = #{prod_color, jdbcType=VARCHAR},
-						prod_delivery = #{prod_delivery, jdbcType=VARCHAR},
-						prod_unit = #{prod_unit, jdbcType=VARCHAR},
-						prod_qtyin = #{prod_qtyin, jdbcType=NUMERIC},
-						prod_qtysale = #{prod_qtysale, jdbcType=NUMERIC},
-						prod_mileage = #{prod_mileage, jdbcType=NUMERIC}
-		WHERE prod_id = #{prod_id, jdbcType=VARCHAR}
-	</update>
 </mapper> 

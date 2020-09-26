@@ -71,8 +71,9 @@
 		</tr>
 		<tr>
 			<th>상품이미지</th>
-			<td><img
-				src="${pageContext.request.contextPath}/prodImages/${prod.prod_img}"></td>
+			<td>
+				<img src="${pageContext.request.contextPath}/prodImages/${prod.prod_img}">
+			</td>
 		</tr>
 		<tr>
 			<th>총재고</th>
@@ -84,7 +85,7 @@
 		</tr>
 		<tr>
 			<th>적정재고</th>
-			<td>${prod.prod_prperstock}</td>
+			<td>${prod.prod_properstock}</td>
 		</tr>
 		<tr>
 			<th>크기</th>

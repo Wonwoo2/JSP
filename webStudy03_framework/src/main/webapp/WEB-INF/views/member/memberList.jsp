@@ -20,7 +20,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			<c:set var="memberList" value="${paginVO.data}"></c:set>
+			<c:set var="memberList" value="${pagingVO.data}"></c:set>
 			<c:choose>
 				<c:when test="${not empty memberList}">
 					<c:forEach items="${memberList}" var="member">

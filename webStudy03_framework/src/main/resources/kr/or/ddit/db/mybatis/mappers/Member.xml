@@ -95,7 +95,6 @@
 			<if test="mem_like neq null">mem_like = #{mem_like, jdbcType=VARCHAR},</if>
 			<if test="mem_memorial neq null">mem_memorial = #{mem_memorial, jdbcType=VARCHAR},</if>
 			<if test="mem_memorialday neq null">mem_memorialday = TO_DATE(#{mem_memorialday,	jdbcType=DATE}, 'YYYY-MM-DD')</if>
-			<if test="mem_img neq null"></if>
 		</set>
 		WHERE mem_id = #{mem_id}
 	</update>

@@ -134,59 +134,59 @@
 		</div>
 	</div>
 	<script type="text/javascript">
-	let listTable = $("#prodTable");
-	let pagingArea = $("#pagingArea");
-	let pagingA = pagingArea.on('click', "a" ,function(){
-		let page = $(this).data("page");
-		searchForm.find("[name='page']").val(page);
-		searchForm.submit();
-		searchForm.find("[name='page']").val(1);
-		return false;
-	});
-	let searchForm = $("#searchForm").on("submit", function(event){
-		event.preventDefault();
-		let url = this.action?this.action:location.href;
-		let method = this.method?this.method:"get";
-		let data = $(this).serialize(); // query string 
-		$.ajax({
-			url : url,
-			method : method,
-			data : data,
-			dataType : "json",
-			success : function(resp) {
-				listTable.find("tbody").empty();
-				pagingArea.empty();
-				let list = resp.data;
-				let trTags = [];
-				if(list.length>0){
-					$(list).each(function(idx, prod){
-						trTags.push(
-							$("<tr>").append(
-								$("<td>").html(
-										$("<a>").text(prod.prod_name)
-												.attr("href", "#")
-												.data("what", prod.prod_id)
-								),
-								$("<td>").text(prod.lprod_nm),
-								$("<td>").text(prod.buyer.buyer_name),
-								$("<td>").text(prod.prod_cost),
-								$("<td>").text(prod.prod_price),
-								$("<td>").text(prod.prod_sale)
-							)
-						);
-						
-					});
-				}else{
-					trTags.push($("<tr>").html($("<td colspan='6'>").text("조건에 맞는 상품이 없음.")));
-				}
-				listTable.find("tbody").html(trTags);
-				pagingArea.html( resp.pagingHTML_BS );
-			},
-			error : function(errResp) {
-			}
+		let listTable = $("#prodTable");
+		let pagingArea = $("#pagingArea");
+		let pagingA = pagingArea.on('click', "a" ,function(){
+			let page = $(this).data("page");
+			searchForm.find("[name='page']").val(page);
+			searchForm.submit();
+			searchForm.find("[name='page']").val(1);
+			return false;
 		});
-		return false;
-	});
+		let searchForm = $("#searchForm").on("submit", function(event){
+			event.preventDefault();
+			let url = this.action?this.action:location.href;
+			let method = this.method?this.method:"get";
+			let data = $(this).serialize(); // query string 
+			$.ajax({
+				url : url,
+				method : method,
+				data : data,
+				dataType : "json",
+				success : function(resp) {
+					listTable.find("tbody").empty();
+					pagingArea.empty();
+					let list = resp.data;
+					let trTags = [];
+					if(list.length>0){
+						$(list).each(function(idx, prod){
+							trTags.push(
+								$("<tr>").append(
+									$("<td>").html(
+											$("<a>").text(prod.prod_name)
+													.attr("href", "#")
+													.data("what", prod.prod_id)
+									),
+									$("<td>").text(prod.lprod_nm),
+									$("<td>").text(prod.buyer.buyer_name),
+									$("<td>").text(prod.prod_cost),
+									$("<td>").text(prod.prod_price),
+									$("<td>").text(prod.prod_sale)
+								)
+							);
+							
+						});
+					}else{
+						trTags.push($("<tr>").html($("<td colspan='6'>").text("조건에 맞는 상품이 없음.")));
+					}
+					listTable.find("tbody").html(trTags);
+					pagingArea.html( resp.pagingHTML_BS );
+				},
+				error : function(errResp) {
+				}
+			});
+			return false;
+		});
 // 	$("#prodTable>tbody").on("click","a", function(){
 // 		let what = $(this).data("what"); 
 <%-- <%-- 		location.href="${pageContext.request.contextPath}/Prod/ProdView.do?what="+what; --%>
@@ -208,6 +208,6 @@
 // 		});
 // 		return false;
 // 	});
-</script>
+	</script>
 </body>
 </html>

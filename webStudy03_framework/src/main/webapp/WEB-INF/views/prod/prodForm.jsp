@@ -1,10 +1,4 @@
-<%@page import="kr.or.ddit.vo.ProdVO"%>
-<%@page import="org.apache.commons.lang3.StringUtils"%>
-<%@page import="java.util.Map.Entry"%>
-<%@page import="kr.or.ddit.vo.BuyerVO"%>
-<%@page import="java.util.Set"%>
-<%@page import="java.util.Map"%>
-<%@page import="java.util.List"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -14,29 +8,31 @@
 <title>prod/prodForm.jsp</title>
 <jsp:include page="/includee/preScript.jsp" />
 </head>
-<%
-	String command = (String) request.getAttribute("command");
-	ProdVO prod = (ProdVO) request.getAttribute("prod");
 
-	if (StringUtils.isNotBlank(command) && "update".equals(command)) {
-%>
 <script type="text/javascript">
 	$(function() {
 		let lguItem = $("[name='prod_lgu']");
 		let buyerItem = $("[name='prod_buyer']")
 		
-		lguItem.find("option[value!=<%= prod.getProd_lgu() %>]").remove();
-		buyerItem.find("option[value!=<%= prod.getProd_buyer() %>]").remove();
-		$("#imageDiv").append($("<img>").attr("src", "<%= request.getContextPath() %>/prodImages/<%= prod.getProd_img() %>"));
-		$("[name='prod_image']").attr("required", false);
+		let command = "${command}";
+		if (command && "update" == command) {
+			lguItem.find("option[value!=${prod.prod_lgu}]").remove();
+			buyerItem.find("option[value!=${prod.prod_buyer}]").remove();
+			$("#imageDiv").append($("<img>").attr("src", "${pageContext.request.contextPath}/prodImages/prod.prod_img"));
+			$("[name='prod_image']").attr("required", false);
+		}
+		
+		lguItem.on("change", function() {
+			let lguValue = $(this).val();
+			buyerItem.find("option").attr("disabled", false);
+			if (lguValue) {
+				buyerItem.find("option[class!=" + lguValue + "]").attr("disabled", true);
+			} 
+		});
 	});
-</script>		
-<%
-	}
-%>
+</script>
 
 <body>
-<jsp:useBean id="errors" class="java.util.LinkedHashMap" scope="request"/>
 	<form method="post" enctype="multipart/form-data">
 		<table>
 			<tr>
@@ -65,21 +61,17 @@
 					<div class="form-group form-inline">
 						<select name="prod_lgu">
 							<option>상품분류</option>
-							<%
-								List<Map<String, Object>> lprodList = (List) request.getAttribute("lprodList");
-								if (lprodList != null && lprodList.size() != 0) {
-									for (int i = 0; i < lprodList.size(); i ++) {
-										Map<String, Object> lprodMap = lprodList.get(i);
-										String lprod_gu = (String) lprodMap.get("lprod_gu");
-										String lprod_nm = (String) lprodMap.get("lprod_nm");
-							%>
-							<option value="<%= lprod_gu %>"><%= lprod_nm %></option>
-							<%				
-									}
-								}
-							%>
+							<c:set var="lprodList" value="${lprodList}">
+							</c:set>
+							<c:choose>
+								<c:when test="${not empty lprodList}">
+									<c:forEach items="${lprodList}" var="lprod">
+										<option value="${lprod.lprod_gu}">${lprod.lprod_nm}</option>
+									</c:forEach>
+								</c:when>
+							</c:choose>
 						</select>
-						<span class="error"><%=errors.get("prod_lgu") %></span>
+						<span class="error">${errores.prod_lgu}</span>
 					</div>
 				</td>
 			</tr>
@@ -87,23 +79,17 @@
 				<th>거래처코드</th>
 				<td>
 					<div class="form-group form-inline">
-<!-- 						<input class="form-control mr-2" type="text" required name="prod_buyer" -->
-<%-- 							value="${prod.prod_buyer }" maxLength="6" /> --%>
 						<select name="prod_buyer">
 							<option>거래처</option>
-						<%
-							List<BuyerVO> buyerList = (List) request.getAttribute("buyerList");
-							if (buyerList != null && buyerList.size() != 0) {
-								for (int i = 0; i < buyerList.size(); i ++) {
-									BuyerVO buyer = buyerList.get(i);
-						%>
-							<option value="<%= buyer.getBuyer_id() %>"><%= buyer.getBuyer_name() %></option>
-						<%
-								}
-							}
-						%>	
+							<c:choose>
+								<c:when test="${not empty buyerList}">
+									<c:forEach items="${buyerList}" var="buyer">
+										<option value="${buyer.buyer_id}" class="${buyer.buyer_lgu}">${buyer.buyer_name}</option>	
+									</c:forEach>
+								</c:when>
+							</c:choose>
 						</select>
-						<span class="error"><%=errors.get("prod_buyer") %></span>
+						<span class="error">${errors.prod_buyer}</span>
 					</div>
 				</td>
 			</tr>
@@ -112,8 +98,8 @@
 				<td>
 					<div class="form-group form-inline">
 						<input class="form-control mr-2" type="number" required
-							name="prod_cost" value="${prod.prod_cost }" maxLength="22" />
-						<span class="error"><%=errors.get("prod_cost") %></span>
+							name="prod_cost" value="${prod.prod_cost}" maxLength="22" />
+						<span class="error">${errors.prod_cost}</span>
 					</div>
 				</td>
 			</tr>
@@ -122,8 +108,8 @@
 				<td>
 					<div class="form-group form-inline">
 						<input class="form-control mr-2" type="number" required
-							name="prod_price" value="${prod.prod_price }" maxLength="22" />
-						<span class="error"><%=errors.get("prod_price") %></span>
+							name="prod_price" value="${prod.prod_price}" maxLength="22" />
+						<span class="error">${errors.prod_price}</span>
 					</div>
 				</td>
 			</tr>
@@ -132,8 +118,8 @@
 				<td>
 					<div class="form-group form-inline">
 						<input class="form-control mr-2" type="number" required
-							name="prod_sale" value="${prod.prod_sale }" maxLength="22" />
-						<span class="error"><%=errors.get("prod_sale") %></span>
+							name="prod_sale" value="${prod.prod_sale}" maxLength="22" />
+						<span class="error">${erros.prod_sale}</span>
 					</div>
 				</td>
 			</tr>
@@ -142,8 +128,8 @@
 				<td>
 					<div class="form-group form-inline">
 						<input class="form-control mr-2" type="text" required
-							name="prod_outline" value="${prod.prod_outline }" maxLength="100" />
-						<span class="error"><%=errors.get("prod_outline") %></span>
+							name="prod_outline" value="${prod.prod_outline}" maxLength="100" />
+						<span class="error">${errors.prod_outline}</span>
 					</div>
 				</td>
 			</tr>
@@ -152,8 +138,8 @@
 				<td>
 					<div class="form-group form-inline">
 						<input class="form-control mr-2" type="text" name="prod_detail"
-							value="${prod.prod_detail }" maxLength="4000" />
-						<span class="error"><%=errors.get("prod_detail") %></span>
+							value="${prod.prod_detail}" maxLength="4000" />
+						<span class="error">${errors.prod_detail}</span>
 					</div>
 				</td>
 			</tr>
@@ -162,8 +148,8 @@
 				<td>
 					<div class="form-group form-inline" id="imageDiv">
 						<input class="form-control mr-2" type="file" required name="prod_image"
-							value="${prod.prod_img }" maxLength="40" />
-						<span class="error"><%=errors.get("prod_img") %></span>
+							value="${prod.prod_img}" maxLength="40" />
+						<span class="error">${errors.prod_img}</span>
 					</div>
 				</td>
 			</tr>
@@ -172,9 +158,9 @@
 				<td>
 					<div class="form-group form-inline">
 						<input class="form-control mr-2" type="number" required
-							name="prod_totalstock" value="${prod.prod_totalstock }"
+							name="prod_totalstock" value="${prod.prod_totalstock}"
 							maxLength="22" />
-						<span class="error"><%=errors.get("prod_totalstock") %></span>
+						<span class="error">${errors.prod_totalstock}</span>
 					</div>
 				</td>
 			</tr>
@@ -184,7 +170,7 @@
 					<div class="form-group form-inline">
 						<input class="form-control mr-2" type="date" name="prod_insdate" readonly
 							value="${prod.prod_insdate }" maxLength="7" />
-						<span class="error"><%=errors.get("prod_insdate") %></span>
+						<span class="error">${errors.prod_insdate}</span>
 					</div>
 				</td>
 			</tr>
@@ -193,9 +179,9 @@
 				<td>	
 					<div class="form-group form-inline">
 						<input class="form-control mr-2" type="number" required
-							name="prod_properstock" value="${prod.prod_properstock }"
+							name="prod_properstock" value="${prod.prod_properstock}"
 							maxLength="22" />
-						<span class="error"><%=errors.get("prod_properstock") %></span>
+						<span class="error">${errors.prod_properstock}</span>
 					</div>
 				</td>
 			</tr>
@@ -204,8 +190,8 @@
 				<td>
 					<div class="form-group form-inline">
 						<input class="form-control mr-2" type="text" name="prod_size"
-							value="${prod.prod_size }" maxLength="20" />
-						<span class="error"><%=errors.get("prod_size") %></span>
+							value="${prod.prod_size}" maxLength="20" />
+						<span class="error">${errors.prod_size}</span>
 					</div>
 				</td>
 			</tr>
@@ -215,7 +201,7 @@
 					<div class="form-group form-inline">
 						<input class="form-control mr-2" type="text" name="prod_color"
 							value="${prod.prod_color }" maxLength="20" />
-						<span class="error"><%=errors.get("prod_color") %></span>
+						<span class="error">${errors.prod_color}</span>
 					</div>
 				</td>
 			</tr>
@@ -224,8 +210,8 @@
 				<td>
 					<div class="form-group form-inline">
 						<input class="form-control mr-2" type="text" name="prod_delivery"
-							value="${prod.prod_delivery }" maxLength="255" />
-						<span class="error"><%=errors.get("prod_delivery") %></span>
+							value="${prod.prod_delivery}" maxLength="255" />
+						<span class="error">${errors.prod_delivery}</span>
 					</div>
 				</td>
 			</tr>
@@ -234,8 +220,8 @@
 				<td>
 					<div class="form-group form-inline">
 						<input class="form-control mr-2" type="text" name="prod_unit"
-							value="${prod.prod_unit }" maxLength="6" />
-						<span class="error"><%=errors.get("prod_unit") %></span>
+							value="${prod.prod_unit}" maxLength="6" />
+						<span class="error">${erros.prod_unit}</span>
 					</div>
 				</td>
 			</tr>
@@ -244,8 +230,8 @@
 				<td>
 					<div class="form-group form-inline">
 						<input class="form-control mr-2" type="number" name="prod_qtyin"
-							value="${prod.prod_qtyin }" maxLength="22" />
-						<span class="error"><%=errors.get("prod_qtyin") %></span>
+							value="${prod.prod_qtyin}" maxLength="22" />
+						<span class="error">${errors.prod_qtyin}</span>
 					</div>
 				</td>
 			</tr>
@@ -255,7 +241,7 @@
 					<div class="form-group form-inline">
 						<input class="form-control mr-2" type="number" name="prod_qtysale"
 							value="${prod.prod_qtysale }" maxLength="22" />
-						<span class="error"><%=errors.get("prod_qtysale") %></span>
+						<span class="error">${errors.prod_qtysale}</span>
 					</div>
 				</td>
 			</tr>
@@ -265,7 +251,7 @@
 					<div class="form-group form-inline">
 						<input class="form-control mr-2" type="number" name="prod_mileage"
 							value="${prod.prod_mileage }" maxLength="22" />
-						<span class="error"><%=errors.get("prod_mileage") %></span>
+						<span class="error">${erros.prod_mileage}</span>
 					</div>
 				</td>
 			</tr>

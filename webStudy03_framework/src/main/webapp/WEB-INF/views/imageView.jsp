@@ -1,3 +1,4 @@
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@page import="kr.or.ddit.Contants"%>
 <%@page import="org.apache.commons.lang3.StringUtils"%>
 <%@page import="java.io.File"%>
@@ -48,6 +49,16 @@
 	});
 </script>
 <select multiple size="10">
+<%-- 	<c:choose> --%>
+<%-- 		<c:when test="${not empty listFiles}"> --%>
+<%-- 			<c:forEach items="${listFiles}" var="file"> --%>
+<%-- 				${header.accept} --%>
+<%-- 			</c:forEach> --%>
+<%-- 		</c:when> --%>
+<%-- 		<c:otherwise> --%>
+			
+<%-- 		</c:otherwise> --%>
+<%-- 	</c:choose> --%>
 	<%
 		String[] listFiles = (String[]) request.getAttribute("listFiles");
 		for (String file : listFiles) {

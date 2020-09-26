@@ -52,6 +52,8 @@ public class BuyerVO {
 	private String buyer_charger;
 	@Size(max = 2)
 	private String buyer_telext;
+	@Size(max = 2)
+	private String buyer_delete;
 	
 	private String lprod_nm;
 	private List<ProdVO> prodList;
