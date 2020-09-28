@@ -34,7 +34,7 @@ public class ProdRetrieveController {
 	private IOtherDAO dao = OtherDAOImpl.getInstance();
 
 	@URIMapping(value = "/prod/prodView.do", method = HttpMethod.GET)
-	public String prodView(@RequestParameter(name = "what") String what, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	public String prodView(@RequestParameter(name = "what") String what, HttpServletRequest req) throws ServletException, IOException {
 		ProdVO prod = service.retrieveProd(what);
 		req.setAttribute("prod", prod);
 		String goPage = "prod/prodView";

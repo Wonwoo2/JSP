@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.board.dao.IReplyDAO">
+	<select id="selectReplyCount" parameterType="PagingVO" resultType="int">
+		SELECT COUNT(*) 
+		FROM replyjsp
+		WHERE bo_no = #{searchDetail.bo_no}
+	</select>
+	
+	<select id="selectReplyList" parameterType="PagingVO" resultType="ReplyVO">
+		SELECT A.*
+		FROM
+		(
+			SELECT ROWNUM rn, A.*
+			FROM
+			(
+				SELECT rep_no, bo_no, rep_content, rep_writer, TO_CHAR(rep_date, 'YYYY-MM-DD') rep_date, rep_ip, rep_pass
+				FROM replyjsp
+				WHERE bo_no = #{searchDetail.bo_no}
+				ORDER BY rep_date DESC
+			) A 
+		) A
+		WHERE rn BETWEEN #{startRow} AND #{endRow}
+	</select>
+</mapper>

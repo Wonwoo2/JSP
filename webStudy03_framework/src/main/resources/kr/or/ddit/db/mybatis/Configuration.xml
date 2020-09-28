@@ -25,7 +25,9 @@
 		<mapper resource="kr/or/ddit/db/mybatis/mappers/Buyer.xml" />
 		<mapper resource="kr/or/ddit/db/mybatis/mappers/Other.xml" />
 		
-		
+		<mapper resource="kr/or/ddit/db/mybatis/mappers/Board.xml" />
+		<mapper resource="kr/or/ddit/db/mybatis/mappers/Attatch.xml" />
+		<mapper resource="kr/or/ddit/db/mybatis/mappers/Reply.xml" />
 		
 		
 		

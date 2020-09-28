@@ -46,8 +46,7 @@
 	<resultMap type="ProdVO" id="ProdMap" autoMapping="true">
 		<id property="prod_id" column="prod_id" />
 		<association property="buyer" javaType="BuyerVO" autoMapping="true"></association>
-		<collection property="memberList" ofType="MemberVO" autoMapping="true">
-		</collection>
+		<collection property="memberList" ofType="MemberVO" autoMapping="true"></collection>
 	</resultMap>
 	
 	<select id="selectProd" parameterType="string" resultMap="ProdMap">

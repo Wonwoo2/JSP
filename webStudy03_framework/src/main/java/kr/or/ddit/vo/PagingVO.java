@@ -30,7 +30,7 @@ public class PagingVO<T> implements Serializable {
 	
 	private List<T> data; 
 	
-	private PagingVO(int screenSize, int blockSize) {
+	public PagingVO(int screenSize, int blockSize) {
 		super();
 		this.screenSize = screenSize;
 		this.blockSize = blockSize;

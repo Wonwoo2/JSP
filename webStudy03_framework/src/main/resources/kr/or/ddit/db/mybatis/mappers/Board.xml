@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.board.dao.IBoardDAO">
+	<resultMap type="BoardVO" id="boardMap" autoMapping="true">
+		<id property="bo_no" column="bo_number" />
+		<collection property="replyList" ofType="ReplyVO" autoMapping="true"></collection>
+		<collection property="attatchList" ofType="AttatchVO" autoMapping="true"></collection>
+	</resultMap>
+	
+	<select id="selectBoard" parameterType="BoardVO" resultMap="boardMap">
+		SELECT board.bo_no AS bo_number, bo_title, bo_writer, bo_date, bo_content, bo_pass, bo_ip, bo_hit, bo_parent,
+				att_no, att_filename, att_savename, att_mime, att_filesize, att_fancysize, att_downcount,
+				rep_no, rep_content, rep_writer, rep_date, rep_ip, rep_pass
+		FROM board LEFT OUTER JOIN replyjsp ON(board.bo_no = replyjsp.bo_no)
+			LEFT OUTER JOIN attatch ON(board.bo_no = attatch.bo_no)
+			WHERE board.bo_no = #{bo_no}
+	</select>
+
+	<select id="selectBoardCount" parameterType="PagingVO" resultType="int">
+		SELECT COUNT(*)
+		FROM board
+	</select>
+	
+	<select id="selectBoardList" parameterType="PagingVO" resultType="BoardVO">
+		SELECT A.*
+			FROM
+				(SELECT ROWNUM rn, A.* 
+		            FROM
+		            (SELECT *
+		                FROM board 
+		                ORDER BY bo_date DESC
+		            ) A
+		        ) A
+				WHERE A.rn BETWEEN #{startRow} AND #{endRow}
+	</select>
+	
+	<update id="incrementHit" parameterType="int">
+		UPDATE board SET
+			bo_hit = bo_hit + 1
+			WHERE bo_no = #{bo_no}
+	</update>
+	
+	<update id="updateBoard" parameterType="BoardVO">
+		UPDATE board SET
+			<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(bo_title)">
+				bo_title = #{bo_title, jdbcType=VARCHAR},
+			</if>
+			<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(bo_writer)">
+				bo_writer = #{bo_writer, jdbcType=VARCHAR},
+			</if>
+			<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(bo_date)">
+				bo_date = #{bo_date, jdbcType=DATE},
+			</if>
+			<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(bo_content)">
+				bo_content = #{bo_content, jdbcType=CLOB},
+			</if>
+			<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(bo_pass)">
+				bo_pass = #{bo_pass, jdbcType=VARCHAR},
+			</if>
+			<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(bo_ip)">
+				bo_ip = #{bo_ip, jdbcType=VARCHAR},
+			</if>
+			<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(bo_hit)">
+				bo_hit = #{bo_hit, jdbcType=NUMERIC},
+			</if>
+			<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(bo_parent)">
+				bo_parent = #{bo_parent, jdbcType=NUMERIC},
+			</if>
+			WHERE bo_no = #{bo_no}
+	</update>
+</mapper>
