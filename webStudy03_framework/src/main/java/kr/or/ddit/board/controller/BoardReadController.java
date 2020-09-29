@@ -19,7 +19,6 @@ import kr.or.ddit.mvc.annotation.URIMapping;
 import kr.or.ddit.mvc.annotation.resolvers.RequestParameter;
 import kr.or.ddit.vo.BoardVO;
 import kr.or.ddit.vo.PagingVO;
-import kr.or.ddit.vo.ReplyVO;
 
 @CommandHandler
 public class BoardReadController {
@@ -59,5 +58,10 @@ public class BoardReadController {
 		BoardVO boardVo = service.readBoard(bo_no);
 		request.setAttribute("board", boardVo);
 		return "board/boardView";
+	}
+
+	@URIMapping(value = "/board/boardForm.do", method = HttpMethod.GET)
+	public String getBoardForm() {
+		return "board/boardForm";
 	}
 }

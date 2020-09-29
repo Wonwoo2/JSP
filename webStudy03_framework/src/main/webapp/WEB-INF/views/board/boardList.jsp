@@ -47,10 +47,30 @@
 					</c:choose>
 				</tbody>
 			</table>
+			<div class="form-row">
+				<div class="form-group mr-4">
+					<select class="form-control" name="searchType">
+						<option value="all">전체</option>
+						<option value="title">제목</option>
+						<option value="content">내용</option>
+						<option value="writer">작성자</option>
+					</select>
+				</div>
+				<div class="form-group">
+					<input class="form-control mb-2" type="text" name="searchWord" />
+				</div>
+				<div class="form-group ml-3">
+					<input class="form-control mb-2 btn btn-dark" type="button" value="검색" />
+				</div>
+			</div>
+		</form>
+		<form action="${pageContext.request.contextPath}/board/boardForm.do">
+			<input class="btn btn-info mb-3" type="submit" value="게시글 작성" />
 		</form>
 		<div id="pagingArea">
 			${pagingVo.pagingHTML_BS}
 		</div>
+		
 	</div>
 	
 	<script type="text/javascript">
@@ -94,7 +114,7 @@
 							);
 							
 						});
-					}else{
+					} else {
 						trTags.push($("<tr>").html($("<td colspan='4'>").text("해당 게시판은 게시글이 존재하지 않습니다.")));
 					}
 					listTable.find("tbody").html(trTags);

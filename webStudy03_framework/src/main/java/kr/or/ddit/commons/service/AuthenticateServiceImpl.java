@@ -3,6 +3,7 @@ package kr.or.ddit.commons.service;
 import kr.or.ddit.enumpkg.ServiceResult;
 import kr.or.ddit.member.dao.IMemberDAO;
 import kr.or.ddit.member.dao.MemberDAOImpl;
+import kr.or.ddit.utils.SecurityUtils;
 import kr.or.ddit.vo.MemberVO;
 
 public class AuthenticateServiceImpl implements IAuthenticateService {
@@ -16,7 +17,7 @@ public class AuthenticateServiceImpl implements IAuthenticateService {
 		if (savedMember == null) {
 			result = ServiceResult.NOTEXIST;
 		} else {
-			String inputPass = member.getMem_pass();
+			String inputPass = SecurityUtils.encryptSha512(member.getMem_pass());
 			String savedPass = savedMember.getMem_pass();
 			
 			if (savedPass.equals(inputPass)) {

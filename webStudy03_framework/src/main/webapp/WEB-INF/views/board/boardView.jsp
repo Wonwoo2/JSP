@@ -10,7 +10,7 @@
 </head>
 <body>
 	<div class="container">
-		<table id="boardViewTable" class="table table-boardered">
+		<table class="table table-boardered">
 			<thead>
 				<tr>
 					<td>제목 : ${board.bo_title}(${board.bo_no})</td>
@@ -30,44 +30,47 @@
 					</td>
 				</tr>
 			</tbody>
-			<tfoot>
-				<tr>
-					<th colspan="2">댓글리스트</th>
-				</tr>
-				<c:choose>
-					<c:when test="${not empty pagingVo.data}">
-						<c:set value="${pagingVo.data}" var="replyList" />
-						<c:forEach items="${replyList}" var="reply">
-							<tr>
-								<td rowspan="2">${reply.rep_content}</td>
-								<td>${reply.rep_writer}(${reply.rep_ip})</td>
-							</tr>
-							<tr>
-								<td>${reply.rep_date}</td>
-							</tr>
-						</c:forEach>
-					</c:when>
-					<c:otherwise>
-						<tr>
-							<td colspan="2">댓글이 존재하지 않습니다.</td>
-						</tr>
-					</c:otherwise>
-				</c:choose>
-			</tfoot>
 		</table>
+		
+		<form id="replyResgistForm" class="form-inline" 
+					action="${pageContext.request.contextPath}/reply/replyRegist.do" method="post">
+			<div class="form-group col-md-12">
+				<input class="form-control mb-3 mr-3" type="text" name="rep_writer" placeholder="작성자" />
+				<input class="form-control mb-3 mr-3" type="password" name="rep_pass" placeholder="비밀번호" />
+				<input class="form-control mb-3" type="text" name="rep_ip" value="${pageContext.request.remoteAddr}" readonly />
+			</div>
+			<div class="form-group col-md-12">
+				<textarea class="form-control mb-3" rows="5" cols="200" name="rep_content"></textarea>
+				<input class="form-control mb-2 mr-3 btn btn-info" type="submit" value="전송" />
+				<input class="form-control mb-2 btn-info" type="reset" value="취소" />
+			</div>
+		</form>
+		<br/>
+		<table id="replyViewTable" class="table table-boardered">
+			<thead>
+				<tr>
+					<td colspan="4">댓글리스트(비동기)</td>
+				</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+		<form id="replyForm" action="${pageContext.request.contextPath}/reply/replyView.do">
+			<input type="hidden" name="what" value="${board.bo_no}"/>
+			<input type="hidden" name="page" />
+		</form>
 		<div id="pagingArea">
 			${pagingVo.pagingHTML_BS}
 		</div>
 	</div>
-	<form id="replyForm" action="${pageContext.request.contextPath}/reply/replyView.do">
-		<input type="hidden" name="what" value="${board.bo_no}"/>
-		<input type="hidden" name="page" />
-	</form>
+	
+	<script type="text/javascript" src="${pageContext.request.contextPath}/re"></script>
 	
 	<script type="text/javascript">
 		$(function() {
-			let listTable = $("#boardViewTable");
+			let listTable = $("#replyViewTable");
 			let pagingArea = $("#pagingArea");
+			
 			let pagingA = pagingArea.on('click', "a" ,function(){
 				let page = $(this).data("page");
 				replyForm.find("[name='page']").val(page);
@@ -75,6 +78,7 @@
 				replyForm.find("[name='page']").val(1);
 				return false;
 			});
+			
 			let replyForm = $("#replyForm").on("submit", function(event){
 				event.preventDefault();
 				let url = this.action ? this.action : location.href;
@@ -86,11 +90,12 @@
 					data : data,
 					dataType : "json",
 					success : function(resp) {
-						listTable.find("tfoot").empty();
+						listTable.find("tbody").empty();
 						pagingArea.empty();
 						
 						let list = resp.data;
 						let trTags = [];
+						
 						if(list.length > 0){
 							$(list).each(function(idx, reply){
 								trTags.push(
@@ -98,24 +103,24 @@
 										$("<td>").text(reply.rep_content),
 										$("<td>").text(reply.rep_writer + "(" + reply.rep_ip + ")"),
 										$("<td>").text(reply.rep_date),
-										$("<td>").html(
+										$("<td>").append(
 												$("<input>").attr({
 													type : "button",
 													value : "수정" 
-												}).addClass("btn btn-info modify"), 
+												}).addClass("btn btn-info modifyReply mr-3"), 
 												$("<input>").attr({
 													type : "button",
 													value : "삭제"
-												}).addClass("btn btn-danger delete")
+												}).addClass("btn btn-danger removeReply")
 										)
 									).data(reply)
 								);
-								
 							});
-						}else{
+						} else {
 							trTags.push($("<tr>").html($("<td colspan='4'>").text("댓글이 존재하지 않습니다.")));
 						}
-						listTable.find("tfoot").html(trTags);
+						
+						listTable.find("tbody").html(trTags);
 						pagingArea.html(resp.pagingHTML_BS);
 					},
 					error : function(errResp) {
@@ -124,6 +129,19 @@
 				});
 				return false;
 			}).submit();
+			
+			function modifyReply() {
+				
+			}
+			
+			function removeReply() {
+				
+			}
+			
+			listTable.on("click", ".modifyReply", modifyReply)
+						.on("click", ".removeReply", removeReply);
+			
+			
 		});
 	</script>
 </body>

@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.or.ddit.board.dao.IReplyDAO">
+	<insert id="insertReply">
+		<selectKey resultType="int" order="BEFORE" keyProperty="rep_no">
+			SELECT NVL(MAX(rep_no), 0) + 1
+			FROM replyjsp
+		</selectKey>
+		INSERT INTO replyjsp(rep_no, bo_no, rep_content, rep_writer, rep_date, rep_ip, rep_pass)
+		VALUES(#{rep_no}, #{bo_no}, #{rep_content}, #{rep_writer}, #{rep_date}, #{rep_ip}, #{rep_pass})
+	</insert>
+
 	<select id="selectReplyCount" parameterType="PagingVO" resultType="int">
 		SELECT COUNT(*) 
 		FROM replyjsp

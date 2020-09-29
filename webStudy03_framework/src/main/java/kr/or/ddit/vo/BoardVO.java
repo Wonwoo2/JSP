@@ -1,11 +1,13 @@
 package kr.or.ddit.vo;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+import kr.or.ddit.filter.wrapper.PartWrapper;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -39,6 +41,20 @@ public class BoardVO implements Serializable {
 	private Integer bo_hit;
 	private Integer bo_parent;
 	
+	private Integer firstAttNo;
+	
 	private List<ReplyVO> replyList;
 	private List<AttatchVO> attatchList;
+	
+	private List<PartWrapper> attatchFiles;
+	
+	public void setAttatchFiles(List<PartWrapper> attatchFiles) {
+		this.attatchFiles = attatchFiles;
+		if (attatchFiles != null && attatchFiles.size() > 0) {
+			this.attatchList = new ArrayList<>(attatchFiles.size());
+			for (PartWrapper partWrapper : attatchFiles) {
+				attatchList.add(new AttatchVO(partWrapper));
+			}
+		}
+	}
 }

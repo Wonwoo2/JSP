@@ -17,6 +17,7 @@ public class AuthenticateServiceImpl implements IAuthenticateService {
 			result = ServiceResult.NOTEXIST;
 		} else {
 			String inputPass = member.getMem_pass();
+			
 			String savedPass = savedMember.getMem_pass();
 			
 			if (savedPass.equals(inputPass)) {
